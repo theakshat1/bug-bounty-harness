@@ -101,6 +101,9 @@ Agent context is lossy. These files are authoritative; keep them current.
 | `recon/inventory.md` | Hosts, resolution, operator, scope classification |
 | `recon/routes.md` | Routes, methods, params, auth boundary, enforcement |
 | `recon/coverage.md` | **The coverage claim.** What was hunted, by whom, verdict |
+| `recon/anomalies.md` | **The anomaly ledger.** Every observation you could not explain. Private by construction, so it is the one seed no competitor has. Append to it; never prune it. |
+| `recon/hypotheses.md` | Scored hypotheses from ideation, most-non-obvious first |
+| `corpus/` | **The private seed corpus.** Curated methodology idea bank — read `corpus/README.md` |
 | `recon/slices.md` | Prioritized (component × class) hunt plan |
 | `findings/confirmed.jsonl` | Passed validation; awaiting human review |
 | `findings/rejected.jsonl` | **The negative ledger.** Kill reasons, gate failed, cost |
@@ -126,6 +129,13 @@ with the same kill reason — if you believe a kill was wrong, say what evidence
   duplicate #40.
 - **Abstract disclosed reports to their root-cause shape**, then find variants. The
   original endpoint is duplicated to death; the variants are not.
+- **Seed ideation from `corpus/` and `recon/anomalies.md`** — but a corpus card is a
+  starting point, never a hypothesis. The corpus is distilled from public posts thousands
+  of others also read; what's unique is `corpus card × this target's specifics`. If you
+  can't name the target-specific observation, you have someone else's tweet, not a lead.
+- **Log every unexplained observation** to `recon/anomalies.md`, even when it isn't
+  exploitable today. Discarding an anomaly throws away the only thing that was uniquely
+  yours.
 - **Ground every claim** in a `file:line` you actually read or a real HTTP response.
   No grounding, no candidate.
 - **Deterministic oracles over model judgment** wherever one exists.

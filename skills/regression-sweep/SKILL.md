@@ -15,6 +15,13 @@ because reproducing them requires the original context.
 
 ## Sources of leads
 
+**Start with the private corpus:**
+`corpus/x-bookmarks-2026-09/bb-research/x-bookmarks-2026-09-detailed/10-n-day-patch.md`
+holds n-day and patch-diff pattern cards — including the authz-filter-vs-dispatcher
+normalization mismatch class and version-fingerprint triage. Read it before working a
+target with public advisories.
+
+
 1. **The program's public disclosures** (HackerOne/Bugcrowd disclosed reports).
 2. **Your own resolved reports** — the HackerOne MCP is read-only and good for this.
 3. **The changelog / release notes / security advisories** — a terse "fixed an

@@ -1,0 +1,224 @@
+# Deep research articles — bug-bounty corpus extract
+
+Source set: 11 article/repo/dataset URLs from x-bookmark-lane.
+Extracted: 2026-10-02 (Asia/Calcutta). High-level patterns only — no exploit PoCs or attack recipes.
+
+## Counts
+
+- **ok**: 11
+- **blocked**: 0
+- **thin**: 0
+- **error**: 0
+
+## Files
+
+- `/workspace/bug-bounty-corpus/x-bookmark-lane/deep_research_articles.jsonl`
+- `/workspace/bug-bounty-corpus/x-bookmark-lane/deep_research_articles.md`
+
+## Compact index (all 11)
+
+- **1.** [Adverserial AI — Intelligence, engineered for cyber (CyberKimi / CyberGLM)](https://adverserial.ai) — `ok` — n/a-tooling
+- **2.** [Jenny was a Friend of Mine - MCPs and Friends (Autonomous Vulnerability Hunting with MCP)](https://blog.zsec.uk/bullyingllms/) — `ok` — LLM/MCP-orchestrated vuln hunting; grammar-based fuzzing; patch-diff campaigns; auth-bypass/SSRF/OEM chains (high-level methodology)
+- **3.** [Needle in the haystack: LLMs for vulnerability research](https://devansh.bearblog.dev/needle-in-the-haystack/) — `ok` — LLM-assisted code audit methodology; authz boundary bugs; JWT/JWKS algorithm confusion; signature validation flaws; CI egress-control gaps (pattern-level)
+- **4.** [OWASP MCP Security Taxonomy](https://github.com/OWASP/MCP-Taxonomy) — `ok` — n/a-meta
+- **5.** [Awesome Agent Orchestrators](https://github.com/andyrewlee/awesome-agent-orchestrators) — `ok` — n/a-tooling
+- **6.** [Cadence — experimental learning library (flat/deep/recursive patch nets)](https://github.com/muellerberndt/cadence) — `ok` — n/a-tooling
+- **7.** [Chat On Steroids — local MCP capabilities for ChatGPT](https://github.com/totec448-spec/chat-on-steroids) — `ok` — n/a-tooling
+- **8.** [Zaevlad/audit-findings-dataset — Smart Contract Audit Findings (viewer)](https://huggingface.co/datasets/Zaevlad/audit-findings-dataset/viewer) — `ok` — n/a-meta
+- **9.** [Leaking MTN Customer PII & Order History via IDOR on a Ticket Management Domain](https://medium.com/@4osp3l/leaking-mtn-customer-pii-order-history-via-idor-on-a-ticket-management-domain-cd3306e36e29?postPublishedType=initial) — `ok` — IDOR / broken object-level authorization; JS/sourcemap recon leading to hidden API surface
+- **10.** [How I Got AWS Secret Keys from Exposed Variables in JS File](https://medium.com/@mohameddiv77/how-i-got-aws-secret-keys-from-exposed-variables-in-js-file-c67f61039da6) — `ok` — Client-side secret exposure; Cognito User Pool / Identity Pool misconfiguration leading to temporary AWS credentials
+- **11.** [From Patch to Exploit; Using Claude Code to reverse engineer a zero-day in Papercut NG](https://techanarchy.net/from-patch-to-exploit-using-claude-code-to-reverse-engineer-a-zero-day-in-papercut-ng/) — `ok` — N-day / patch-diff research with LLM harness; authz filter vs dispatcher path-normalization mismatches; multi-bug chain analysis (high-level methodology only)
+
+## Per-item summaries
+
+### 1. Adverserial AI — Intelligence, engineered for cyber (CyberKimi / CyberGLM)
+
+- **type**: article
+- **source**: https://adverserial.ai
+- **x_post_id**: 2097848169002627208
+- **status**: ok
+- **vuln_class_or_technique**: n/a-tooling
+- **preconditions**:
+  - Access to specialized cyber-tuned LLM APIs (CyberKimi/CyberGLM) or similar security-focused models
+  - Security context inputs: code, logs, artifacts for analysis workflows
+- **generalized_hunting_idea**: Domain-specialized LLMs for security can support detection engineering, IR timeline reconstruction, and threat-hunt hypothesis generation when fed logs/code/artifacts—treat as an analysis aid with privacy and verification constraints, not an autonomous exploit engine.
+- **tags**: llm-security-tooling, detection-engineering, threat-hunting, cyberkimi, api-product
+- **key_takeaways**:
+  - Cyber-tuned models advertise workflows for Sigma/YARA/KQL translation, IR sequencing, and hunt hypotheses from security context.
+  - Vendor claims include large-context cyber reasoning and published eval evidence (e.g., CyberPVP / ExploitBench)—verify independently before relying.
+  - Useful as tooling meta for researchers building analysis loops; not a vulnerability writeup.
+
+### 2. Jenny was a Friend of Mine - MCPs and Friends (Autonomous Vulnerability Hunting with MCP)
+
+- **type**: article
+- **source**: https://blog.zsec.uk/bullyingllms/
+- **x_post_id**: 2097218639074070705
+- **status**: ok
+- **vuln_class_or_technique**: LLM/MCP-orchestrated vuln hunting; grammar-based fuzzing; patch-diff campaigns; auth-bypass/SSRF/OEM chains (high-level methodology)
+- **preconditions**:
+  - Isolated research lab (e.g., Proxmox VMs) with target and analysis hosts
+  - MCP-wrapped RE/fuzz/debug/reporting tools and persistent campaign storage
+  - Human validation gates before any disclosure/submission
+- **generalized_hunting_idea**: Wrap the research toolchain as MCP tools, organize work as campaigns, force every LLM finding through a hallucination→validated promotion pipeline (PoC existence, clean-snapshot reproduce, exploitability, low-priv reachability), and feed crashes/defenses/bounty ROI back into RAG so later hunts skip hardened dead-ends and favor under-scrutinized high-ROI targets.
+- **tags**: mcp, autonomous-hunting, hallucination-gates, rag-feedback, patch-diff, fuzzing, bounty-roi, methodology
+- **key_takeaways**:
+  - Treat LLM outputs as hallucinations until multi-gate validation (including standard-user reachability) promotes them.
+  - Knowledge loop + known-defense DB compounds: record negatives (AM-PPL, signature walls) to avoid repeating failed campaigns.
+  - Bounty intelligence (payout × competition × patch history) steers effort toward OEM/enterprise middleware sweet spots.
+
+### 3. Needle in the haystack: LLMs for vulnerability research
+
+- **type**: article
+- **source**: https://devansh.bearblog.dev/needle-in-the-haystack/
+- **x_post_id**: 2098447232764969079
+- **status**: ok
+- **vuln_class_or_technique**: LLM-assisted code audit methodology; authz boundary bugs; JWT/JWKS algorithm confusion; signature validation flaws; CI egress-control gaps (pattern-level)
+- **preconditions**:
+  - Readable target source (OSS or authorized audit scope)
+  - Prior CVE/advisory history or architectural threat model for the project
+  - Verifier loop (tests, builds, harnesses) to confirm model claims
+- **generalized_hunting_idea**: Avoid bloated AGENT.md scaffolds and 'find all vulns' prompts (context rot). Use minimal scaffolding: derive a one-page threat model from past CVEs and trust boundaries, audit thin slices (auth, JWT, cookies, sandbox egress), demand call-chain evidence, and spend most tokens on slice exploration + verification—not prompt bureaucracy.
+- **tags**: llm-audit, threat-model, context-rot, minimal-scaffolding, authz, jwt, ci-security, prompt-patterns
+- **key_takeaways**:
+  - Threat modeling from prior CVEs + trust-boundary slices beats vague breadth-first prompts.
+  - Keep persistent scaffolding tiny; large Agent.md/Skill libraries become the haystack that hides needles.
+  - Prompt frames that force adversary/invariant thinking and iterative 'what else?' improve signal; always verify with tests/harnesses.
+
+### 4. OWASP MCP Security Taxonomy
+
+- **type**: article
+- **source**: https://github.com/OWASP/MCP-Taxonomy
+- **x_post_id**: 2096312505907757265
+- **status**: ok
+- **vuln_class_or_technique**: n/a-meta
+- **preconditions**:
+  - Building, reviewing, or threat-modeling MCP hosts/clients/servers/gateways
+  - Need for shared vocabulary across AppSec, AI security, and GRC
+- **generalized_hunting_idea**: Use a vendor-neutral MCP risk taxonomy (relationship map, OWASP MCP Top 10 mapping, root-cause tags like INJ-CMD/SSRF/AUTH-BYPASS/X-TENANT) to structure reviews of agent tools, transport, and backend trust boundaries instead of ad-hoc checklists.
+- **tags**: owasp, mcp, taxonomy, threat-modeling, ai-security, reference
+- **key_takeaways**:
+  - Provides common language for MCP host/client/server/transport/backend risks.
+  - Maps to OWASP MCP Top 10 and CVE-aligned weakness families useful for hunt checklists.
+  - Aimed at security engineers, developers, GRC, and researchers comparing MCP taxonomies.
+
+### 5. Awesome Agent Orchestrators
+
+- **type**: article
+- **source**: https://github.com/andyrewlee/awesome-agent-orchestrators
+- **x_post_id**: 2096878410920312970
+- **status**: ok
+- **vuln_class_or_technique**: n/a-tooling
+- **preconditions**:
+  - Need to run/supervise multiple coding or research agents (worktrees, loops, swarms)
+  - Interest in harness patterns for long-running autonomous tasks
+- **generalized_hunting_idea**: Curated catalog of agent orchestrators (parallel coding agents, swarms, autonomous loop/task runners, infrastructure primitives) helps researchers pick harnesses for multi-agent security workflows—isolation via worktrees/sandboxes, verification gates, and human approval inboxes matter more than raw agent count.
+- **tags**: awesome-list, agent-orchestrators, multi-agent, harness, tooling
+- **key_takeaways**:
+  - Organizes tools into parallel coding, swarms, loop runners, task runners, infra, and personal assistants.
+  - Common patterns: git worktrees, durable sessions, verification/approval gates, mobile/remote supervision.
+  - Useful meta-resource when designing LLM-assisted hunting pipelines.
+
+### 6. Cadence — experimental learning library (flat/deep/recursive patch nets)
+
+- **type**: article
+- **source**: https://github.com/muellerberndt/cadence
+- **x_post_id**: 2102279243535470945
+- **status**: ok
+- **vuln_class_or_technique**: n/a-tooling
+- **preconditions**:
+  - Python 3.11+ environment for experimental learning/agent research
+  - Interest in alternative learning architectures (not a vuln writeup)
+- **generalized_hunting_idea**: Cadence is an experimental 'brain' library (bounded patches, settlement, recursive error feedback) for learning routines—relevant only as adjacent agent/ML tooling research, not as a security vulnerability technique.
+- **tags**: ml-library, agents, experimental, learning, n/a-security-writeup
+- **key_takeaways**:
+  - Offers flat, deep, and recursive layout modes with a shared patch/settlement API.
+  - Positioned as experimental learning/agent infrastructure, not AppSec methodology.
+  - Mark as tooling/meta for corpus completeness; limited direct bug-bounty technique content.
+
+### 7. Chat On Steroids — local MCP capabilities for ChatGPT
+
+- **type**: article
+- **source**: https://github.com/totec448-spec/chat-on-steroids
+- **x_post_id**: 2096596480874127450
+- **status**: ok
+- **vuln_class_or_technique**: n/a-tooling
+- **preconditions**:
+  - ChatGPT account with MCP app capability; local desktop install
+  - Approved project folders and reviewed local tool permissions
+- **generalized_hunting_idea**: Local MCP + browser companion patterns let chat models operate on real files/terminals/workers—for security research tooling, emphasize permission scoping, provider rule compliance, and human supervision; do not use local tools to override safety refusals.
+- **tags**: mcp, chatgpt, local-tools, multi-agent, tooling, desktop
+- **key_takeaways**:
+  - Bridges ChatGPT to local files, shell, workers, Goal/Loop, and Compact & Resume workflows via MCP.
+  - README stresses responsible use: no bypassing provider limits/safety via local automation.
+  - Tooling-adjacent for agentic research setups; not a vulnerability writeup.
+
+### 8. Zaevlad/audit-findings-dataset — Smart Contract Audit Findings (viewer)
+
+- **type**: article
+- **source**: https://huggingface.co/datasets/Zaevlad/audit-findings-dataset/viewer
+- **x_post_id**: 2105631548825538969
+- **status**: ok
+- **vuln_class_or_technique**: n/a-meta
+- **preconditions**:
+  - Interest in smart-contract audit pattern mining / model training data prep
+  - Willingness to clean/dedupe/normalize raw semi-structured findings first
+- **generalized_hunting_idea**: Large corpora of labeled audit findings (title, description, severity, recommendations; often Solidity) can seed threat models and pattern libraries for web3 reviews—use for classification and invariant brainstorming after cleaning; treat embedded PoC fields as dataset content to study patterns, not as ready-to-run attack recipes.
+- **tags**: dataset, smart-contracts, solidity, audit-findings, web3, training-data
+- **key_takeaways**:
+  - ~23.6k smart-contract audit findings with severity and recommendation fields (10K–100K size class).
+  - Author notes data is raw/semi-structured and needs cleaning before training use.
+  - Viewer preview shows recurring classes: fee/token decimal mismatches, reentrancy CEI issues, deflationary token accounting, slippage, gas underestimation.
+
+### 9. Leaking MTN Customer PII & Order History via IDOR on a Ticket Management Domain
+
+- **type**: article
+- **source**: https://medium.com/@4osp3l/leaking-mtn-customer-pii-order-history-via-idor-on-a-ticket-management-domain-cd3306e36e29?postPublishedType=initial
+- **x_post_id**: 2097681915343962113
+- **status**: ok
+- **vuln_class_or_technique**: IDOR / broken object-level authorization; JS/sourcemap recon leading to hidden API surface
+- **preconditions**:
+  - In-scope (or accepted) assets under org control, including ticket/management subdomains referenced from JS
+  - Ability to harvest JS/source maps and enumerate backend API routes
+  - Public or weakly gated endpoints that reveal object identifiers (e.g., event creator UUIDs)
+- **generalized_hunting_idea**: After subdomain enum, recursively harvest JS and source maps for hidden domains and full API route maps; when a 'public' endpoint leaks object IDs (UUIDs), cross-check other routes that take the same ID for missing authz (classic IDOR chaining). Expand surface to org-managed ticket/ops domains that may still be in bounty scope.
+- **tags**: idor, bola, js-recon, sourcemaps, api-enumeration, pii, bug-bounty
+- **key_takeaways**:
+  - JS bundles can expose entire backend route maps and secondary management domains.
+  - Public listing endpoints that leak UUIDs are pivot keys into user-scoped order/PII APIs.
+  - Org-controlled ticket/ops hosts discovered via assets are worth testing even if they look 'external'.
+
+### 10. How I Got AWS Secret Keys from Exposed Variables in JS File
+
+- **type**: article
+- **source**: https://medium.com/@mohameddiv77/how-i-got-aws-secret-keys-from-exposed-variables-in-js-file-c67f61039da6
+- **x_post_id**: 2098083417644491166
+- **status**: ok
+- **vuln_class_or_technique**: Client-side secret exposure; Cognito User Pool / Identity Pool misconfiguration leading to temporary AWS credentials
+- **preconditions**:
+  - JS bundles (and especially source maps) on in-scope hosts exposing Cognito pool/client/identity IDs
+  - Cognito flows that allow signup/auth and identity pools with usable IAM roles for authenticated users
+  - Authorized bug-bounty testing of the affected program
+- **generalized_hunting_idea**: On SPA/dev subdomains, mine JS and reconstructed source maps for cloud identity config (Cognito userPoolId, clientId, identityPoolId). Assess whether exposed client config plus open signup/auth can obtain temporary cloud credentials and what IAM permissions those roles grant—report exposure and over-permissioned identity pools; do not use obtained access beyond authorized proof.
+- **tags**: aws, cognito, js-secrets, sourcemaps, credential-exposure, bug-bounty, misconfiguration
+- **key_takeaways**:
+  - Source maps can reveal environment files with full Cognito/AWS client configuration.
+  - Exposed Cognito client IDs alone are common; impact rises when identity pools mint usable AWS temp keys.
+  - Repeat the same JS/sourcemap check across sibling subdomains—misconfigs often cluster.
+
+### 11. From Patch to Exploit; Using Claude Code to reverse engineer a zero-day in Papercut NG
+
+- **type**: article
+- **source**: https://techanarchy.net/from-patch-to-exploit-using-claude-code-to-reverse-engineer-a-zero-day-in-papercut-ng/
+- **x_post_id**: 2096977246531559872
+- **status**: ok
+- **vuln_class_or_technique**: N-day / patch-diff research with LLM harness; authz filter vs dispatcher path-normalization mismatches; multi-bug chain analysis (high-level methodology only)
+- **preconditions**:
+  - Public advisory/IoCs and access to vulnerable vs patched builds for authorized lab analysis
+  - Isolated lab (VM snapshots) plus RE tools (decompiler, browser automation) orchestrated carefully
+  - Human skepticism: challenge agent assumptions and demand end-to-end lab validation
+- **generalized_hunting_idea**: For freshly patched, actively exploited products: stand up vulnerable and patched labs, patch-diff from IoC strings to changed auth/SQL sinks, hunt systematic auth-check mismatches (filter normalization vs router semantics; page/service context confusion), and keep pushing the model when a chain is incomplete. After vendor patches, re-sweep the same bug classes for residual bypasses—without publishing exploit recipes.
+- **tags**: n-day, patch-diff, llm-harness, auth-bypass-patterns, java, enterprise-software, methodology
+- **key_takeaways**:
+  - LLM + lab harness can accelerate advisory→root-cause→validation loops when humans force proof against live instances.
+  - Auth bugs often cluster: path-normalization mismatches and wrong-context access checks are recurring classes worth systematic sweeps.
+  - Actively-exploited N-days justify post-patch variant hunting; validate chains end-to-end and disclose via vendor channels.

@@ -35,6 +35,32 @@ Read, in this order:
 5. The program's **public disclosures** — these are the crowded ideas. Read them to
    learn what *not* to propose, and to harvest shapes for variant analysis.
 
+### Then seed from the private corpus
+
+Read `corpus/README.md`, then the cluster docs matching your surface under
+`corpus/x-bookmarks-2026-09/bb-research/x-bookmarks-2026-09-detailed/` (`01-idor-bola.md`,
+`04-llm-hunting-process.md`, `05-mcp-tooling.md`, `10-n-day-patch.md`, …). Also read
+`recon/anomalies.md` if it exists — unexplained observations are your highest-value and
+most private seed.
+
+**This is the "seed it with your own expertise" move** from
+`docs/11-non-obvious-thinking.md` §11.10 — one of only two things that reliably
+differentiate a hunter when everyone runs the same models on the same scope.
+
+> **A corpus card is a starting point, never a hypothesis.**
+
+The corpus is distilled from **public** posts thousands of others bookmarked, so a card on
+its own is just a bug class — and §11.2 is explicit that working down a list of bug classes
+is what produces duplicates. What's unique is the combination:
+
+```
+corpus card  ×  a specific observation about THIS target  →  hypothesis
+```
+
+For every card you use, name the recon observation that makes it suspicious *here*. If you
+can't, you don't have a hypothesis. Respect the corpus's own `thin` / `anecdotal` /
+`blocked-recovered` labels — those are leads, not facts.
+
 Then run the generators. Aim for **15–25 hypotheses** before scoring any of them.
 Quantity first, judgment second — judging too early collapses you onto the obvious.
 
@@ -250,7 +276,8 @@ non-obvious first).
 
 ```
 ### H07 · Export re-runs the query without the tenant filter
-  generator:     G4 lifecycle (export stage) + G5 derived copy
+  generator:     G5 lifecycle (export stage) + G3 variant
+  seed:          corpus 01-idor-bola #1.5 (internal library wrapper missing caller authz)
   target specific: POST /api/v2/reports/export, seen only in app.bundle.js:4417;
                    no UI entry point. Accepts the same `filter` object as
                    GET /api/v2/reports, which IS tenant-scoped at
@@ -269,7 +296,8 @@ non-obvious first).
 
 Required fields: `generator`, `target specific` (**the proof you looked at this
 target**), `hypothesis`, `how to disprove fast`, `oracle if real`, `crowding score`
-with its components, `cost to check`.
+with its components, `cost to check`. Add `seed:` when a corpus card or anomaly-ledger
+entry informed it — it makes the private-knowledge contribution auditable.
 
 Then a summary table, and an explicit recommendation of the **3–5 to hunt first**,
 ordered by `crowding score` then `cost to check` ascending — cheapest disqualifier

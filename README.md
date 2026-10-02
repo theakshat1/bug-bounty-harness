@@ -50,13 +50,22 @@ it in Needs More Info. → [12 — Triage & Report Mechanics](docs/12-triage-and
 ## What's in here
 
 ```
-docs/        the knowledge base — 10 researched documents
-skills/      6 working Claude Code skills
-agents/      4 subagents, incl. the adversarial disprover
+docs/        the knowledge base — 13 researched documents
+corpus/      the PRIVATE seed corpus — a curated idea bank (your edge)
+skills/      8 working Claude Code skills
+agents/      5 subagents, incl. the ideator and the adversarial disprover
 hooks/       PreToolUse scope enforcement + SessionStart state injection
 scripts/     the hook implementations (fail-closed scope guard)
 reference/   scope template, example .mcp.json, checklists
 ```
+
+### Why `corpus/` matters
+
+Everything in `docs/` is synthesized from public research — so every other hunter can read
+the same sources. `corpus/` is the half they can't: a curated, private idea bank that
+ideation reads before generating. Per [docs/11 §11.10](docs/11-non-obvious-thinking.md),
+seeding an agent with knowledge nobody else has is one of only two moves that reliably
+differentiate a hunter now. **Grow it** — see [corpus/README.md](corpus/README.md).
 
 ### The knowledge base
 

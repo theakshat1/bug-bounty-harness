@@ -88,6 +88,24 @@ def main() -> None:
             "if you update this file. Pick unhunted surfaces first."
         )
 
+    # --- anomaly ledger (highest-value private seed) ---
+    anomalies = [
+        # strip any existing markdown bullet so we don't render "- - item"
+        ln.lstrip().lstrip("-*").strip()
+        for ln in read_lines(os.path.join(root, "recon", "anomalies.md"), MAX_LINES)
+        if not ln.lstrip().startswith("#")
+    ]
+    anomalies = [ln for ln in anomalies if ln]
+    if anomalies:
+        parts.append(
+            f"## Anomaly ledger — {len(anomalies)} unexplained observation(s)\n"
+            + "\n".join(f"- {ln}" for ln in anomalies[-15:])
+            + "\n\nThese are observations nobody could explain. They are private by "
+              "construction, so they are the one ideation seed no competitor shares — "
+              "an unexplained anomaly became an entire new bug class for one researcher "
+              "seven years later. Revisit them when ideating, and never prune the file."
+        )
+
     # --- negative ledger ---
     rejected = read_jsonl(os.path.join(root, "findings", "rejected.jsonl"), MAX_REJECTED)
     if rejected:
@@ -123,8 +141,11 @@ def main() -> None:
 
     header = (
         "# bb-harness state\n"
-        "Authorized bug bounty testing only. Validation-first: a candidate is not a "
-        "finding until the disprove ladder passes and a human has reviewed it.\n"
+        "Authorized bug bounty testing only.\n"
+        "- Originality decides what to hunt: seed ideation from `corpus/` and "
+        "`recon/anomalies.md`, and score crowding BEFORE spending proof budget.\n"
+        "- Validation decides what to submit: a candidate is not a finding until the "
+        "disprove ladder passes and a human has reviewed it.\n"
     )
     print(
         json.dumps(

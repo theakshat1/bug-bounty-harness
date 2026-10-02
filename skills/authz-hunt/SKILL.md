@@ -22,6 +22,14 @@ find the path that skips them.
 **Never** use a discovered identifier that might belong to a real customer. If
 enumeration returns UUIDs, do not "just check one" — that one is someone's data.
 
+## Seed from the corpus first
+
+`corpus/x-bookmarks-2026-09/bb-research/x-bookmarks-2026-09-detailed/01-idor-bola.md` holds
+seven authorization-mismatch cards (hidden role UUIDs, JS-graveyard endpoints, sourcemap→
+UUID pivots, internal library wrappers missing caller authz, JWT claim trust gaps, sibling
+backends). Read them, then ask for each: **what did I see in recon that this makes
+suspicious here?** A card alone is a bug class; the hypothesis is the card × this target.
+
 ## The core principle
 
 > **The UI's allowlist is not the server's allowlist.**

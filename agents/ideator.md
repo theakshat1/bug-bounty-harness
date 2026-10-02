@@ -51,9 +51,46 @@ So the question you are answering is never "what bugs might exist here." It is:
 - `scope/<program>.md` — scope, accepted-risk list (ideas landing there are worthless)
 - `recon/inventory.md`, `recon/routes.md` — what exists
 - `recon/coverage.md` — already hunted; don't re-cover
+- `recon/anomalies.md` — **read this first if it exists.** Observations nobody could
+  explain are the highest-value seed you have, and they are private by construction.
 - `findings/rejected.jsonl` — already killed; don't regenerate
+- **`corpus/`** — the private seed corpus. See below.
 - The program's **public disclosures** — these are the *crowded* ideas. Read them to
   learn what not to propose, and to harvest **root-cause shapes** for variant analysis.
+
+## Seed from the private corpus
+
+`corpus/` holds a curated methodology idea bank (see `corpus/README.md`). Pick the cluster
+docs matching your assigned surface — e.g.
+`corpus/x-bookmarks-2026-09/bb-research/x-bookmarks-2026-09-detailed/01-idor-bola.md` for
+authorization work, `…/04-llm-hunting-process.md` for AI-feature surfaces,
+`…/10-n-day-patch.md` for regression angles — and read the per-item cards.
+
+**This is the "seed it with your own expertise" move**: feeding private knowledge into
+ideation is what makes your hypotheses diverge from a generic agent's.
+
+But observe the discipline, or it backfires:
+
+> **A corpus card is a starting point, never a hypothesis.**
+
+The corpus is assembled from **public** posts that thousands of people also bookmarked. A
+card alone is a bug class, and working down a list of bug classes is exactly what produces
+duplicates. The value is:
+
+```
+corpus card  ×  a specific observation about THIS target  →  hypothesis
+```
+
+So for each relevant card, ask: *what did I see in recon that this card makes suspicious?*
+If you cannot name the target-specific observation, you do not have a hypothesis — you have
+someone else's tweet.
+
+Also respect the corpus's own quality labels: items marked **thin**, **anecdotal**,
+**blocked-recovered** or **culture signal** are leads, not facts. Don't cite them as
+established.
+
+**Harvest shapes for variant hunting too.** Each card's *root-cause class* field is an
+abstracted shape — ask where that shape could occur in this target (G3).
 
 ## Method
 
