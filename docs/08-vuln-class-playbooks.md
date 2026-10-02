@@ -55,6 +55,18 @@ Tooling:
 - **Sub-states** — a user briefly both "unverified" and "has a session"
 - Currency/rounding/negative quantities; discount applied after total; cancel-and-refund ordering
 
+### What makes a race *reliable* (not just firable)
+Tooling tells you how to fire a race; it doesn't tell you why one lands. Three mechanics,
+from kernel race research: **widen the window** (make the contended operation slower),
+**restructure toward cheaper error paths** (a request that short-circuits returns faster and
+tightens the collision), and **isolate contending locks** so your two operations don't
+serialize on something unrelated. **[S]**
+
+This matters for reporting, not just exploitation: B's own standard is to state a success
+rate over ≥5–10 runs, and these three levers are what move that number from 1-in-50 to
+near-deterministic — which is the difference between a believable report and an
+"intermittent, could not reproduce" close.
+
 ### Evidence that gets a race report paid
 Triagers need business impact, not speed:
 (a) precondition state, (b) **all** request/response pairs with success codes,
@@ -96,6 +108,46 @@ Still the most productive API family, and the one agents are worst at.
 - **Rate-limit bypass** — per-request limiters vs batching; limiter keyed on IP
   (rotate), on a client-set header, or on the account but not the
   email/phone being targeted; limits on `/v2` but not `/v1`.
+
+### Batch and bulk endpoints — six concrete shapes
+"Batch variants inherit broken validation" is the usual one-liner. The mechanisms, from
+research into a WordPress RCE, are more specific and each is independently testable **[S]**:
+
+1. **Validate/execute index desync.** The API validates in one loop and executes in
+   another. When an error path pushes to only one of two parallel arrays, the arrays
+   desync and a rejected item's *slot* gets filled by its neighbour. Test: submit a mix of
+   valid and invalid items; correlate the validated set against the executed set **by index**.
+2. **Scalar/array type asymmetry.** A sink sanitizes arrays but passes scalars through
+   unsanitized (or the reverse). Test every sanitized parameter as both.
+3. **Self-nesting.** Does the batch endpoint accept **itself** as one of its items? Inner
+   calls inherit the outer call's already-passed validation.
+4. **Cache-vs-DB reconciliation as an escalation gadget.** After any read primitive,
+   in-memory object caches plus a feature that reconciles cache against DB can be driven to
+   promote attacker-influenced state.
+5. **Identity-switch records.** Anywhere the app temporarily assumes another identity
+   (impersonate, run-as, cron-as-owner, webhook-as-installer, support-view): is the
+   structured record driving that switch attacker-influenced?
+6. **Dynamically named hooks/actions.** Handler, event or permission names assembled from
+   fragments (`status` × `type` × `locale`). Any user-influenced fragment means part of the
+   namespace is attacker-controlled.
+
+### The role-ID cardinality diff
+A cheap operation with a deterministic oracle, distinct from mass-assigning `role` **[S]**:
+
+**Count the role/permission IDs the API enumerates, and count the roles the UI renders. The
+delta is your target list.** Role and permission endpoints routinely return more IDs than
+the UI ever displays; if assignment accepts opaque UUIDs, non-UI values are worth testing.
+Then diff user counts, or watch for new "internal" objects appearing, after a role swap.
+
+This is **UI allowlist ≠ server allowlist** reduced to a number you can measure.
+
+### Tenant isolation beyond result sets
+Testing "can A read B's data" misses the derived surfaces. A shared service also persists
+things that merely *derive* from a tenant's input: **query text** (the literal values in
+`WHERE`/`INSERT` clauses), job names, cache keys, metadata, error strings, **blob versions**,
+usage analytics, scheduler state. Test each separately — these have no owner, so nobody
+gated them. Old storage/blob versions in particular often retain secrets the current version
+has been cleaned of. **[S]**
 
 **Oracle:** two owned accounts. A's token requests B's object. Pass = HTTP 200
 **and** response body contains B's unique canary string. Not just a 200.
@@ -223,6 +275,21 @@ CSRF-to-ATO, reliably a P2. Check whether `state` is merely *present* vs actuall
 - Classics still worth running: signature not verified, signature wrapping (XSW),
   comment truncation in NameID, unsigned assertion inside a signed response,
   `samlify`-class library CVEs.
+
+### Structured-field → mail-layer seam
+A clean example of a G6 seam, and absent from most checklists **[S]**: an auth flow accepts
+an email address inside a **JSON string**. The JSON parser guarantees "a string"; the mail
+layer assumes "one address". **Control characters — especially newlines — inside that string
+can cause the mailer or an intermediate parser to treat it as multiple recipients**, so reset
+material reaches an inbox that was never intended.
+
+Test it anywhere a structured field feeds a delivery layer: password reset, email change,
+invites, notification preferences. Per the two-owned-accounts rule, confirm **only** by
+observing whether material arrives at a second inbox **you control** — never by broadcasting
+tokens.
+
+The generalization is worth more than the instance: *what does the encoding layer guarantee,
+and what does the consuming layer assume about structure?*
 
 ### Magic link / OTP
 Link or OTP not invalidated on use or on re-issue; prior unproven credentials not
@@ -429,7 +496,9 @@ touching workflows, and **never actually publish a package or push to a branch.*
 
 Hunt by matching high-signal **key names near assignment operators** (`api_key`,
 `aws_secret`, `client_secret`), not only known token formats — name-based patterns
-catch misnamed and vendor-specific secrets that format-only detectors miss.
+catch misnamed and vendor-specific secrets that format-only detectors miss. A widely-forked
+reference list of credential-ish identifier names:
+https://gist.github.com/h4x0r-dz/be69c7533075ab0d3f0c9b97f7c93a59
 
 **Tooling:** **TruffleHog** for reporting — the **`--only-verified` flag actually
 validates whether a credential is live**, and a verified-live key is undeniable
@@ -440,6 +509,22 @@ TruffleHog + Semgrep. **MapperPlus** bulk-recovers source from exposed `.js.map`
 
 Workflow: katana → collect JS → check for `.map` siblings → MapperPlus →
 jsluice + TruffleHog over recovered source.
+
+### Client config that is not itself a secret, but mints one
+Secret scanning looks for credentials. This class is different and is missed by
+`--only-verified` workflows entirely **[S]**:
+
+Mine SPA and dev-subdomain JS — and reconstructed source maps — for **cloud identity client
+config**: Cognito `userPoolId`, `clientId`, `identityPoolId`, and the equivalents on other
+providers. A client ID on its own is common and usually not a finding. **The impact appears
+when an identity pool will mint usable temporary cloud credentials through an
+over-permissioned IAM role**, especially where signup or unauthenticated identities are
+enabled.
+
+**Severity lives in the IAM role, not in the leak.** So the finding to report is the
+*over-permissioned identity*, and the evidence is the credential's **identity**
+(`sts:GetCallerIdentity`, the role name) — not anything you did with it. Misconfigurations
+of this kind cluster across sibling subdomains, so check the whole family once you find one.
 
 > ⚠️ **Report a found secret; do not use it.** Validate existence via the vendor's
 > own introspection endpoint if one exists. Verification-by-use beyond proving
@@ -480,6 +565,19 @@ Exfiltration channels worth checking: markdown image rendering to an attacker UR
 link auto-unfurling, agent-initiated requests, rendered HTML.
 
 ---
+
+## 8.8b Mobile: exported components
+Harvesting endpoints and GraphQL operation names from an APK (§6.3) is recon. The **IPC
+trust boundary** is a separate, under-tested surface **[S]**.
+
+Triage it the same way you triage web: **map and rank, then hunt.** Extract the main APK,
+enumerate **exported activities** (and the other exported components — services, receivers,
+providers), generate launch commands for them, and only then spend expensive analysis on the
+components that rank interesting.
+
+Why it's worth the setup cost: per [11 §G10](./11-non-obvious-thinking.md), other hunters
+drop off at the mobile toolchain barrier — which makes it a low-competition surface by
+construction.
 
 ## 8.9 The crowded classes (Tier 3)
 

@@ -133,6 +133,13 @@ believable.
   (blank page, proof in an HTML comment), verification instructions in the private
   report. A flashy public PoC panics real customers and can turn a payout into a
   policy violation.
+
+  Two refinements worth adopting **[S]**: **include your platform handle** in the proof
+  artifact, so that if someone else stumbles on the takeover they cannot credibly claim it
+  — it timestamps and attributes your discovery. And **encode the proof string** (not for
+  secrecy, but so a casual viewer sees nothing alarming), putting the **decoding
+  instructions in the private report** so triage can verify in one step while the public
+  surface stays inert.
 - Leave PoC infrastructure running after resolution
 
 ---

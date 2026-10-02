@@ -77,6 +77,49 @@ So: `corpus card × this target's specifics → hypothesis`. Never `corpus card 
 
 ---
 
+## ⚠️ Known-bad cards — do NOT import these
+
+A gap analysis against `docs/` found five corpus positions that **contradict better-sourced
+claims in this knowledge base**. The corpus states them in the same confident register as its
+good material, and its `Quality: ok` label means only *"the fetch succeeded and the card
+isn't thin"* — **not** verified. Reject these:
+
+| Corpus card | What it says | Why it's rejected |
+|---|---|---|
+| `09-recon-workflows.md` §9.1 | *"attack-surface size decides success odds"* | Directly contradicted by three independent **[V]** sources in [docs/11 §11.3](../docs/11-non-obvious-thinking.md): broad agent scope costs **2–2.5× more and solves fewer** challenges (Wiz); Shopify's partitioning beat whole-repo scanning on accuracy *and* recall; a focused prompt out-found a broad one. The corpus's source is a beginner write-up. **Narrow wins. Do not soften this.** |
+| `09-recon-workflows.md` §9.2 | *"compete with pros by breadth of asset discovery"*, wrapping 50+ tools | Same contradiction, plus the source is a `beta 0.1.0` framework the corpus itself labels *"beginner"*. [docs/08 §8.11](../docs/08-vuln-class-playbooks.md): *"a big stack gives you the illusion of coverage without understanding."* |
+| `09-recon-workflows.md` §9.4 | *"treat FAQ-style class definitions as a checklist"* | Contradicts this harness's constitutional rule — generate from operations on the target, **never** by working down a list of bug classes, because everyone has that list. The corpus marks this card `thin` itself. |
+| `04-llm-hunting-process.md` §4.13 | *"orchestrate parallel hunt agents across several programs"* | Contradicts non-negotiable #7 (cap subagents at 2–3) and the one-program-at-a-time depth finding. The card's **own note** says the orchestrator it describes produced *"high duplication"* — which is evidence against it. |
+| `04-llm-hunting-process.md` §4.19 | benchmark leaderboards *"calibrate which multi-agent strategies generalize"* | The corpus contradicts itself here — §4.18 says *"benchmarks ≠ production validity."* Keep the benchmark **URLs** ([docs/03 §3.6b](../docs/03-skills-and-plugins.md)); reject the calibration claim. |
+
+Also note the corpus devotes a whole cluster to XSS/WAF filter work (`07-xss-encoding.md`).
+That's not wrong, but it conflicts on **priority**: 78% of valid autonomous findings are XSS,
+so it's the most crowded class there is. Keep this KB's ordering —
+[don't start with XSS](../docs/11-non-obvious-thinking.md).
+
+### The grading rule for everything else
+
+> **Corpus `ok` ≠ `[V]`.** Default any imported corpus claim to **[S]**, and use **[U]** when
+> the only source is a single X post — which is most of the corpus.
+
+The corpus applies `ok` identically to first-party engineering blogs, vendor product pages,
+an explicitly unverified anecdote, and a post it describes as *"satirical/boastful."* It also
+supplies **no star counts, no last-commit dates and no licences** for any tool it names, so
+nothing from it can enter [docs/02](../docs/02-mcp-servers.md) or
+[docs/03](../docs/03-skills-and-plugins.md) at those documents' standard without independent
+re-verification.
+
+### What was already imported
+The genuinely-new material has been folded into `docs/` already — generators **G14–G18**
+(signing oracles, validate/execute desync, scalar/array asymmetry, batch self-nesting,
+secondary-surface tenancy), **rollback/undo** added to the G5 lifecycle, the six batch-API
+shapes, the role-ID cardinality diff, the JSON-email seam, Cognito identity-pool config, race
+reliability mechanics, Android exported components, five more reference harnesses, the
+ensemble rung, and **Gate 8 (verify the fix)**. You don't need to re-mine those; use the
+corpus for the *cards themselves* when ideating against a specific surface.
+
+---
+
 ## Growing it
 
 The corpus gets more valuable the more private it becomes. Highest-value additions, in

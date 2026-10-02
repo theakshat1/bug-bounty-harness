@@ -80,6 +80,12 @@ jailbreak" gets closed; "unauthenticated RCE in an exposed MCP tool" gets paid.*
 | **Cisco mcp-scanner** | Rule-based + semantic detection of poisoned tool metadata. |
 | **MCPSecBench** (arXiv 2508.13220) | Benchmark — useful for a test checklist. |
 
+**For threat-modelling a specific MCP deployment**, the OWASP **MCP-Taxonomy** repo
+(`https://github.com/OWASP/MCP-Taxonomy`) adds what the Top 10 list alone doesn't: component
+**relationship maps** between host, client, server and gateway, plus root-cause tags
+(injection, SSRF, auth bypass, cross-tenant) you can use to structure a review rather than
+working a flat checklist. **[S — no maintenance date verified.]**
+
 Research anchors: **MCP-DPT** defense-placement taxonomy (arXiv 2604.07551),
 *"When MCP Servers Attack"* (arXiv 2509.24272), **MCPGuard** (arXiv 2510.23673),
 and the NSA-guidance ↔ OWASP-MCP-Top-10 mapping (equixly.com, 2026-06-04).

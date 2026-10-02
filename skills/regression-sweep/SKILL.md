@@ -69,6 +69,20 @@ the reported one.
 Fixes get lost in merges, refactors and reverts. If you reported it a year ago,
 test it again — plainly. This happens more than anyone admits.
 
+## Close the loop automatically
+
+Don't treat regression as a thing you remember to do. **Queue every report for retest at the
+moment it resolves**, so the pipeline has a post-resolution stage rather than ending at
+submission ([05 Gate 8](../../docs/05-validation-gates.md)).
+
+Three operational rules worth copying **[S]**:
+- **Leads live as plain Markdown**, so they survive tool changes and an agent can draft
+  against them without lock-in.
+- **The platform is the system of record; any local database is a cache.** Never let a local
+  store become the truth about report state.
+- **Cross-reference CVE/advisory feeds against program assets continuously**, not once per
+  campaign — an advisory lands on its own schedule, not yours.
+
 ## Method
 
 For each resolved report:

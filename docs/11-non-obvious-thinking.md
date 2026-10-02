@@ -194,6 +194,11 @@ you report something real you already proved.
 
 ## 11.5 The generators
 
+Twenty operations, `G0`–`G18`. `G14`–`G18` came from the private corpus (see
+`corpus/README.md`) and are graded **[S]** — single-source, mostly X posts and vendor
+writeups — so treat them as leads with a cheap falsification step, not as established
+literature.
+
 Operations on the target. Each produces hypotheses that are impossible to write without
 having looked at *this* target.
 
@@ -363,7 +368,7 @@ security controls, then locate **all** endpoints reading/writing them."*
 
 Extended into a lifecycle:
 ```
-issue → store → transmit → consume → refresh → revoke → audit → export → delete
+issue → store → transmit → consume → refresh → revoke → rollback → audit → export → delete
 ```
 Everyone tests **consume**. Prioritize:
 - **revoke** — the strongest single lever. Does revocation actually terminate live
@@ -371,6 +376,11 @@ Everyone tests **consume**. Prioritize:
   self-contained token; you can only outlive it."*
 - **refresh** — does it re-check authorization, or trust the old grant?
 - **export** — does it re-apply the ACL, or dump what the query returns?
+- **rollback / undo / cancel / reset** — **the inverted stage, and the least tested of
+  all.** When a flow is reversed, which *derived* state does it fail to invalidate? Cached
+  pointers, queues, schedulers, denormalized counters, cached entitlements, cached ACLs.
+  Everyone tests forward transitions. A kernel SCTP use-after-free came from exactly this
+  shape: a rollback path freed its tables but left a cached scheduler pointer dangling. **[S]**
 - **delete** — soft-delete still readable?
 
 ---
@@ -494,6 +504,14 @@ support forums · status pages · **orphaned git history** (force-push-orphaned 
 recoverable from GitHub's public events archive in BigQuery — the signal is the
 **zero-commit force push** event).
 
+**And the corollary nobody acts on: a source that blocks your fetcher is equally under-read
+by your competitors.** Cloudflare 403s, sign-in walls, Akamai denies, and empty
+client-rendered SPAs all cause an agent to silently give up — which makes the content behind
+them an under-mined corpus. Keep a fallback chain: curl with real headers ·
+`raw.githubusercontent.com` · CERT mirrors · CVE aggregators · the site's own JSON API
+(a client-rendered leaderboard usually has a `/api/...` endpoint serving the same data).
+This is the G10 inconvenience discount applied one layer up, at the *research input*. **[S]**
+
 ---
 
 ### G12 · Micro-inspiration against spec text
@@ -528,6 +546,84 @@ autonomous research system is unlocked by putting a researcher in the loop in ex
 one place — the discovery cascade."*
 
 > **Never submit the first finding unescalated.** Cascade first.
+
+---
+
+### G14 · Signing-oracle enumeration
+**[S — PageBreak findings; primary URL gated, recovered via a third-party summary]**
+
+The sharpest idea in the private corpus, and it is absent from everywhere else in this KB:
+
+> **When an exploit needs a signature, hunt sibling endpoints that will sign
+> attacker-controlled values with the same key.**
+
+**Operation:** inventory **every endpoint that produces** a signature, HMAC, or signed
+token, and **every endpoint that verifies** one. Build the full producer × verifier matrix
+and test each signature at each verifier.
+
+> **A multi-endpoint system's weakest signer is an oracle for its strongest verifier.**
+
+**Why it's duplicate-resistant:** it requires inventorying the whole crypto surface rather
+than probing one endpoint — and most testers treat "it's signed" as a terminal defence and
+stop. It is also the auth-service↔resource-service seam (G6) made concrete.
+
+---
+
+### G15 · Validate/execute index desync
+**[S — Searchlight Cyber WordPress RCE writeup, Jul 2026]**
+
+**Operation:** for every endpoint accepting an array or batch, find where **validation**
+iterates and where **execution** iterates. Submit a mix of valid and invalid items, then
+check whether a rejected item's *slot* gets filled by its neighbour — i.e. whether an error
+path pushes to one of two parallel arrays but not the other.
+
+**Why duplicate-resistant:** it needs two observations (the validated set and the executed
+set) correlated **by index**. Single-shot agents never do that.
+
+---
+
+### G16 · Scalar / array type asymmetry at a sink
+**[S — same source]**
+
+**Operation:** for every sanitized parameter, send it as a **scalar** and as a
+**one-element array**, in both directions, and compare whether the sanitizer still fires.
+Sinks that sanitize arrays frequently pass scalars straight through, and vice versa.
+
+**Why duplicate-resistant:** it's one extra bracket, and nobody tries it.
+
+---
+
+### G17 · Self-nesting a batch endpoint
+**[S — same source]**
+
+**Operation:** ask whether the batch endpoint accepts **itself** as one of its items. Inner
+calls inherit the outer call's already-passed validation.
+
+**Why duplicate-resistant:** it's recursive, it feels silly, and per G10 inconvenience is a
+duplicate-rate discount.
+
+Two more shapes from the same research, worth testing wherever they apply: **identity-switch
+records** — find every place the app temporarily assumes another identity (impersonate,
+run-as, cron-as-owner, webhook-as-installer, support-view) and ask whether the structured
+record driving the switch is attacker-influenced; and **concatenated handler namespaces** —
+event/hook/permission names assembled from fragments (`status` × `type` × `locale`), where
+any user-influenced fragment means part of the namespace is attacker-controlled.
+
+---
+
+### G18 · Secondary-surface tenancy
+**[S — AWS Athena cross-tenant class]**
+
+Multi-tenant testing almost always means "can tenant A read tenant B's *data*." Invert it:
+
+**Operation:** enumerate every byte a shared service persists that **derives from** a
+tenant's input rather than being the tenant's data — **query text** (the literal values in
+`WHERE`/`INSERT`), job names, cache keys, metadata, error strings, blob versions, usage
+analytics, scheduler state — and test isolation on **each surface separately**.
+
+**Why duplicate-resistant:** everyone gates result sets. The derived surfaces have no owner,
+so nobody gated them. Pairs with the related finding that **old blob/storage versions often
+retain secrets after the current version is cleaned**.
 
 ---
 

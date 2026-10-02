@@ -52,6 +52,28 @@ on the same shape:
      └──────────────┘
 ```
 
+### Two additions worth making to that skeleton **[S]**
+
+**An attack graph as a persisted artifact, alongside the coverage ledger.** The ledger
+records *what was looked at*; a graph records *what reaches what*. Those are different, and
+the graph is exactly what Gate 2 reachability chains need in order to **accumulate across
+runs** instead of being rebuilt every time. One surveyed agent structures its cycle as
+`hunt → attack graph → re-rate/verify → distill techniques into memory`.
+
+**Re-rate as a step distinct from verify.** Verification asks *is this real*; re-rating asks
+*given everything now in the graph, is this still worth what I first thought*. A finding's
+severity can move once you know what else it reaches — in either direction.
+
+**And the interaction contract:** *finish a full round before asking the human*, with an
+interruptible chat channel. That's a concrete answer to a question the five-element skeleton
+leaves open — when to interrupt a human — and it beats both "ask at every step" and "run to
+completion silently."
+
+> Inversion worth one line: when an agent or pentest platform documents how it hardens
+> **itself** — randomized entry paths, no leaked `/login` or `/api`, replay and bruteforce
+> controls — **lift that list and run it against your target.** A vendor's self-defence
+> checklist is a free test plan.
+
 ---
 
 ## 4.2 The reference implementation to study
@@ -165,6 +187,27 @@ last the claimed sink.** Verified line by line.
 9. Assigning severity to `needs_validation`.
 10. Writing the report before independent verification.
 
+### Five more harnesses worth reading **[S — survey, not independently verified]**
+
+Beyond Cloudflare, Shopify and PageBreak, a survey of harness patterns names five with
+architecturally distinct ideas:
+
+| Harness | The distinct idea |
+|---|---|
+| **RAPTOR** | static + dynamic + **solver** gates — a constraint solver as a validation stage, which is a non-LLM oracle of a kind nothing else here uses |
+| **Anthropic `defending-code-reference-harness`** | find → grade → patch, with **ASAN-verified** crash truth in a fresh container |
+| **baby-naptime** | a tight runtime-feedback loop |
+| **evilsocket/audit** | 8-stage trust-boundary enumeration with an explicit **taint-trace** stage |
+| **Visa VVAH** | threat-model **first**, then triage candidates against it |
+
+`ZephrFish/harness-kit` is a published template for the recon→hunt→validate→trace→report
+shape, from the same author as this document's epigraph.
+
+> ⚠️ One caveat on VVAH-style designs: if a call graph is **seeded by an LLM and reinforced
+> with regex** rather than built from a real AST, dynamic dispatch, reflection and framework
+> routing get missed. **Don't mistake a reachability *claim* for a reachability *proof*** —
+> only a real graph or a reproduced effect counts.
+
 ---
 
 ## 4.3 Shopify "Dispatch": the test-oracle idea
@@ -245,6 +288,12 @@ against. Factor that into target selection.
 
 - **Keep each agent below ~25% of its context window.** Cloudflare's explicit
   control for suppressing hallucination. Shopify partitions to 20–30%.
+- **Absolute anchors, where relative ones aren't enough [S]:** roughly **8K tokens for a
+  single-function judgment, ~32K for a synthesis step**. Useful as a sanity check — if a
+  "focused" hunter prompt is running at 100K, it isn't focused.
+- **Summarize scanner noise deterministically before it enters context** — reduce a fuzzer
+  or scanner log to a few hundred tokens with code, not by asking the model to skim it.
+  (`PostToolUse` `updatedToolOutput` is the hook for this; see §4.6.)
 - **Partition, don't dump.** Whole-repo context loses to coherent units on both
   accuracy *and* recall.
 - **Push work out of the model wherever an oracle exists:** schema and ledger

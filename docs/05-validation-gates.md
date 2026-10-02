@@ -204,6 +204,29 @@ submitting. **Never submit the first finding unescalated** — the escalated ver
 worth more and is far less likely to be a duplicate.
 → [11 §G13](./11-non-obvious-thinking.md)
 
+### Gate 8 — Verify the fix (post-resolution, and a first-class stage)
+*Did the patch actually hold?*
+
+Most pipelines terminate at "report submitted." Make the loop close **[S]**:
+
+> **Queue every resolved report for a regression retest, automatically, at the moment it
+> resolves.**
+
+Why this is a gate and not an afterthought:
+- A fix is **new code** written under time pressure, often by someone who didn't write the
+  original — and ~**3–8%** of a program's fixed bugs regress.
+- You already hold the full context of how the bug worked, which nobody else does.
+- Bypasses of shipped fixes are frequently paid in full and are duplicate-resistant.
+- The patch may have fixed only **the path your PoC took**, not the root cause — which is
+  the single most common variant-bug origin (see [11 §G3](./11-non-obvious-thinking.md)).
+
+Operational shape worth copying: keep **leads as plain Markdown** so they survive tool
+changes and agents can draft against them without lock-in; treat the **platform as the system
+of record and any local database as a cache**; and cross-reference CVE/advisory feeds against
+your program's assets continuously rather than per-campaign.
+
+→ [`regression-sweep`](../skills/regression-sweep/SKILL.md)
+
 ---
 
 ## 5.4 The disprove prompt
@@ -299,8 +322,34 @@ successes.
 This is described as *"the single most transferable AI-era design pattern"* — because it
 is the one oracle shape that detects bugs the hypothesis-generator didn't imagine.
 
-**Rule:** if a class has no deterministic oracle, it needs stronger human review
-before submit, and you should say "manually verified" rather than "validated".
+### When a class has no deterministic oracle: the ensemble rung
+
+Between "one model's judgment" and "a human reads it" there is a middle rung that is still
+not an LLM vote **[S]**:
+
+Research on classifying vulnerable functions found **a single base LLM scores roughly
+50–56% — near coin-flip.** Adding richer context (callers, callees, location, code
+patterns), fine-tuning, **multiple different prompt views of the same question**, and then a
+**traditional ML meta-classifier over the ensemble's agreement/disagreement plus metadata**
+reached **~76.9%**.
+
+Two things to take from that:
+
+1. **The 50–56% figure is the sharpest available argument for this document's central
+   rule.** A single model asked "is this a vulnerability?" is barely better than chance — so
+   never let the component that proposes a finding also confirm it, and never treat one
+   model's confidence as evidence.
+2. **The decision rule over N views can itself be deterministic.** Run the same question as
+   several genuinely different prompts, then apply a *fixed rule* to the spread — e.g. unanimous
+   confirm required, or any dissent forces `UNPROVEN`. The arbiter is code, so it cannot
+   hallucinate, even though its inputs are model outputs.
+
+Also from the same work: **feed call-graph context, not isolated functions.** An isolated
+function is the condition under which models perform worst.
+
+**Rule:** if a class has no deterministic oracle, use the ensemble rung, give it stronger
+human review before submit, and say **"manually verified"** rather than "validated" —
+the words should not overclaim the method.
 
 ---
 
@@ -412,6 +461,7 @@ Print this. A finding ships only when every box is checked.
 [ ] G5 Checked against public disclosures / CVEs / program changelog
 [ ] G6 I read this myself and would defend it to the author
 [ ] G7 Cascaded: variants searched, escalation attempted before reporting
+[ ] G8 Queued for regression retest once resolved (the loop closes, ~3-8% regress)
 [ ] Evidence redacted; no third-party PII
 [ ] Severity justified by impact, not by class name
 [ ] Preconditions stated honestly, including the inconvenient ones

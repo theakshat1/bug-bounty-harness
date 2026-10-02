@@ -85,6 +85,11 @@ So for each relevant card, ask: *what did I see in recon that this card makes su
 If you cannot name the target-specific observation, you do not have a hypothesis — you have
 someone else's tweet.
 
+**Read `corpus/README.md`'s "Known-bad cards" section before using the corpus.** Five corpus
+positions contradict better-sourced claims in `docs/` — notably the breadth-over-narrow
+framing and the "use class definitions as a checklist" advice, both of which are the opposite
+of how this harness works. Do not import them.
+
 Also respect the corpus's own quality labels: items marked **thin**, **anecdotal**,
 **blocked-recovered** or **culture signal** are leads, not facts. Don't cite them as
 established.

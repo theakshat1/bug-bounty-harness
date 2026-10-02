@@ -284,6 +284,26 @@ Command hooks receive JSON on stdin and signal via exit code: **0 = allow,
 
 ---
 
+## 3.6b Third-party agent evaluations exist — read them sceptically
+
+§3.2 notes that no skill pack publishes efficacy data. Some third-party leaderboards do
+attempt to score offensive-AI agents: **Tsecbench**
+(`https://tsecbench.zc.tencent.com/#leaderboard`, Tencent-operated, scores agentic red-team
+across CVE/production-like and cloud-native tasks), **XBOW Validation Benchmarks**, and
+**Cybench**.
+
+Worth knowing they exist. But apply [01 §1.3's lab-to-real gap](./01-landscape-2026.md)
+before drawing conclusions: agents exploit 87% of one-day CVEs *given the advisory* and 13%
+of real CVEs without it. A leaderboard rank is a measurement of a benchmark, not of your
+target. Tsecbench having a **cheat-disclosure process** is itself a reason for caution about
+leaderboard-driven conclusions.
+
+**Also:** `awesome-agent-orchestrators`
+(`https://github.com/andyrewlee/awesome-agent-orchestrators`) catalogs orchestrators by
+pattern (parallel-coding, swarms, loop runners, infra primitives). Its own stated conclusion
+matches this document's: prioritize **isolation (worktrees/sandboxes), verification gates and
+human approval inboxes over raw agent count.** No maintenance date available.
+
 ## 3.7 Recommendation
 
 **Don't install a mega-bundle.** Install narrow and specific:

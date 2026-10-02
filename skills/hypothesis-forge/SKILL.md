@@ -58,7 +58,10 @@ corpus card  ×  a specific observation about THIS target  →  hypothesis
 ```
 
 For every card you use, name the recon observation that makes it suspicious *here*. If you
-can't, you don't have a hypothesis. Respect the corpus's own `thin` / `anecdotal` /
+can't, you don't have a hypothesis. **Read `corpus/README.md`'s "Known-bad cards" section
+first** — five corpus positions contradict `docs/` (breadth-over-narrow, class-checklists,
+multi-program parallelism) and must not be imported. Respect the corpus's own `thin` /
+`anecdotal` /
 `blocked-recovered` labels — those are leads, not facts.
 
 Then run the generators. Aim for **15–25 hypotheses** before scoring any of them.

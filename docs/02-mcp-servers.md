@@ -303,6 +303,36 @@ claim less.
 
 ---
 
+## 2.10b From the private corpus — unvetted, verify before use
+
+These came out of the `corpus/` idea bank. **The corpus supplies no star counts, no
+last-commit dates and no licences for any of them**, which is a hard downgrade against this
+document's standard (every other entry carries a maintenance date and a risk rating).
+**Treat the whole block as leads. Check maintenance and read the code yourself before
+running anything here.**
+
+| Name | URL | What it does | Verdict |
+|---|---|---|---|
+| **ripwire** | https://github.com/redhat-et/ripwire | *"ripgrep of AI context"* — deterministic, ranked call-graph map for agents: callers/callees, **edit blast radius**, tests-to-run, forgotten co-changes, using **signatures rather than bodies**. Ships a CLI **and** an MCP server. | **Most interesting entry here.** It directly serves this KB's own advice to feed hunters a call graph rather than whole files ([05 §5.6](./05-validation-gates.md)), and signatures-not-bodies is the right compression. Red Hat emerging-tech org = moderate credibility. Token/orientation wins are a **field-report claim**, unmeasured. |
+| **reburp** | announced at https://x.com/forefy/status/2098160999719211488 (no repo URL given) | Burp extension exposing the **Montoya API over a localhost OpenAPI REST API**, so agents can drive scan control, sitemap, websockets, helpers and other extensions. | ⚠️ **Credible-shaped, because it names exactly the gaps §2.2 documents** (no HTTP/3, no WebSocket *sending*, no scanner launch). **But a localhost REST bridge over all of Burp is a large surface that is unauthenticated by default, and a textbook toxic-flow amplifier under §2.1.** Announcement only — no repo, no licence, no date. **Do not run unvetted.** |
+| **OWASP MCP-Taxonomy** | https://github.com/OWASP/MCP-Taxonomy | Vendor-neutral MCP security taxonomy: component **relationship maps**, OWASP MCP Top 10 mapping, root-cause tags (injection, SSRF, auth bypass, cross-tenant). | Useful. The *relationship map* is the piece [10 §10.2](./10-mcp-as-target-and-risk.md) lacks — it has the Top 10 as a checklist but no component graph. OWASP project, so reasonable provenance. |
+| **quarry-vrc** | https://github.com/skraft9/quarry-vrc | Agentic bug-bounty console: HackerOne sync **and submit**, a regression-retest queue for shipped fixes, Markdown leads as agent memory, advisory full-text search. | 🚩 **Catalog the architecture; do not run it.** It takes your **HackerOne API token** and **can submit reports** — which collides with §2.4 (avoid every community HackerOne integration, precisely because they take your platform token) *and* with this harness's non-negotiable #1, *never submit a report*. Its genuinely good ideas — auto-queue regressions at resolution, leads as plain Markdown, platform-as-truth/local-DB-as-cache — are captured in [05 Gate 8](./05-validation-gates.md) without running the tool. |
+| **StrikeAgent_AtkBrain-Flash** | https://github.com/Yean-Sec/StrikeAgent_AtkBrain-Flash | Agentic external-foothold hunter: hunt → attack graph → re-rate/verify → technique memory; red-team/SRC/CTF mode separation. Ships a Docker image bundling probe tooling. | **Read for the ideas, don't install.** The attack-graph-as-artifact and re-rate-vs-verify distinctions are worth having ([04 §4.1](./04-harness-architecture.md)). A Docker image bundling probe tooling is the same capability-aggregation risk class scored in §2.9. |
+
+### Also noted, low credibility
+**SubMap** (`https://SubMap.net`) — commercial ASM doing subdomain inventory + CVE/KEV
+correlation + takeover-prone DNS; sole source is the vendor site, and
+[08 §8.11](./08-vuln-class-playbooks.md) already does this with `pdtm` + `dnsx` CNAME
+filtering. **AKCA** (`github.com/akha-security/akca`, Go DAST) and **azpt**
+(`github.com/hac01/azure-pentesting-suite`, Azure/Entra recon) are promo-tweet-sourced and
+unvetted — though azpt's underlying idea, that **old blob/storage versions retain secrets**,
+is captured in [08 §8.2](./08-vuln-class-playbooks.md). **adverserial.ai** (cyber-tuned model
+behind an OpenAI/Anthropic-dialect shim): its "no inference logs" claim is unverified and
+routing private-program traffic to a third-party model vendor conflicts with §2.2's
+data-processing caution.
+
+---
+
 ## 2.11 Audit the servers before you trust them
 
 Run these **as CLIs, not as connected MCP servers** — note the self-referential
