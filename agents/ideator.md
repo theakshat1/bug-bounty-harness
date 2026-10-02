@@ -57,26 +57,35 @@ So the question you are answering is never "what bugs might exist here." It is:
 
 ## Method
 
-Apply the twelve generators from `skills/hypothesis-forge/SKILL.md`:
+Apply the generators from `skills/hypothesis-forge/SKILL.md` (full evidence and
+attribution in `docs/11-non-obvious-thinking.md`):
 
 | | Generator | Core question |
 |---|---|---|
-| G1 | Assumption inversion | What does this assume is true? Negate it. |
-| G2 | Defended treasure | They defended path A to this prize — what's path B? |
-| G3 | Seam hunting | What does one side guarantee, and what does the next assume? |
-| G4 | Lifecycle tracing | issue→store→transmit→consume→**refresh→revoke→export→delete** |
-| G5 | Derived copies | What else reads this store, with which controls? |
-| G6 | Second-order / temporal | Twice, concurrent, out of order, after revocation, undone |
-| G7 | Composition | A is safe, B is safe — what about A∘B? |
-| G8 | Actor × state matrix | Which weird actor × weird object state did nobody test? |
-| G9 | History as oracle | What shipped recently? What was fixed, reverted, TODO'd? |
-| G10 | Un-demoed features | What has no marketing screenshot? |
-| G11 | Scope archaeology | What's in scope that nobody thinks of as the product? |
-| G12 | Fresh technique | What was published recently that nobody applied here yet? |
+| G0 | **Surface first** | What architectural surface am I attacking, and why has nobody named it? |
+| G1 | **Anomaly ledger** | What have I seen that I never explained? |
+| G2 | **Changelog mining** | What shipped, what was fixed, what regressed, what did a fix-discussion reveal? |
+| G3 | **Variant hunting** | Where else does this already-disclosed root cause occur? |
+| G4 | **Scanner gap** | Did the paper's author ship a tool? If not, build it. |
+| G5 | **Lifecycle tracing** | issue→store→transmit→consume→**refresh→revoke→export→delete** |
+| G6 | **Seam hunting** | What does one side guarantee, and what does the next assume? |
+| G7 | **Composition** | A is safe, B is safe — what about A∘B? |
+| G8 | **Order inversion** | What if I reverse the prescribed workflow? |
+| G9 | **Developer corner-cutting** | What would they skimp on because it isn't business-central? |
+| G10 | **Boring/hard filter** | What would other hunters hate doing? |
+| G11 | **Out-of-band** | What's outside the HTTP surface that agents ignore? |
+| G12 | **Spec fragments** | What does the RFC permit that implementations disagree on? |
+| G13 | **Cascade** | (post-hit) Where else? What else does this enable? |
 
-Prioritize **G2, G3, G4-revoke, G7 and G8** — they are the highest-yield and the least
-run by others. G7 especially: a bug requiring two parts seen at once is one that
-partitioned agents miss by design.
+Prioritize **G0, G1, G2, G3, G4, G5-revoke, G7 and G10** — highest-yield and least-run by
+others. **G2 and G3 are near-zero-cost: run them first** on any target with public
+disclosures or release notes. G7 especially: a bug requiring two parts seen at once is one
+that partitioned agents miss by design.
+
+**One prompting discipline, from the HTTP Terminator research:** work from *small*
+fragments of context, not whole documents — *"models aggressively anchor on all context
+provided, so every extra sentence of prompt risks context-contamination."* When you reach
+for a spec or a long doc, pull the 1–3 relevant sentences, not the file.
 
 ## Scoring
 

@@ -43,8 +43,7 @@ prompts. → [05 — Validation Gates](docs/05-validation-gates.md)
 
 ### And the report is the last gate
 A proven, novel bug still pays nothing if a triager closes it as Informative or stalls
-it in Needs More Info. → [07 — Reporting](docs/07-reporting-that-gets-paid.md)
-(a deeper platform-mechanics doc, `12`, is in progress)
+it in Needs More Info. → [12 — Triage & Report Mechanics](docs/12-triage-and-report-mechanics.md)
 
 ---
 
@@ -74,7 +73,8 @@ reference/   scope template, example .mcp.json, checklists
 | [08 — Vuln Class Playbooks](docs/08-vuln-class-playbooks.md) | Per-class methodology, ordered by what pays |
 | [09 — Scope & Ethics](docs/09-scope-authorization-and-ethics.md) | Read first. The gate before everything |
 | [10 — MCP as Target & Risk](docs/10-mcp-as-target-and-risk.md) | A paying surface, **and** how your own harness gets you banned |
-| [11 — Non-Obvious Thinking](docs/11-non-obvious-thinking.md) | **The core principle.** Twelve generators for duplicate-resistant hypotheses, and the obviousness filter |
+| [11 — Non-Obvious Thinking](docs/11-non-obvious-thinking.md) | **The core principle.** 14 generators for duplicate-resistant hypotheses, the obviousness filter, and the audited duplicate data |
+| [12 — Triage & Report Mechanics](docs/12-triage-and-report-mechanics.md) | Platform-by-platform: exact states, reputation costs, what gets closed, how to dispute |
 
 ### The skills
 
@@ -86,7 +86,8 @@ reference/   scope template, example .mcp.json, checklists
 | `/bb-harness:recon-surface-map` | Attack-surface inventory, route map, coverage ledger |
 | `/bb-harness:authz-hunt` | IDOR/BOLA/BFLA/BOPLA, shadow API versions, tenant isolation |
 | `/bb-harness:validate-finding` | **The moat.** Adversarial disprove ladder |
-| `/bb-harness:regression-sweep` | Retests shipped fixes — highest-ROI surface available |
+| `/bb-harness:regression-sweep` | Retests shipped fixes — ~3–8% of program fixes regress |
+| `/bb-harness:report-writer` | Writes the report so a triager can't close it |
 
 ### The subagents
 
@@ -173,7 +174,8 @@ echo '{"tool_name":"WebFetch","tool_input":{"url":"https://api.example.com/"}}' 
 4. /bb-harness:hunt-campaign <program>     → orchestrates the rest
      ...which runs ideation FIRST, so you hunt uncrowded ideas
 5. Read every confirmed finding yourself.             ← Gate 6, never automated
-6. /bb-harness:regression-sweep <program>  → the surface nobody works
+6. /bb-harness:report-writer <finding> <platform>  → triage-optimized write-up
+7. /bb-harness:regression-sweep <program>  → the surface nobody works
 ```
 
 ---

@@ -119,6 +119,15 @@ Expect to kill most of what the hunters produce. That is the system working, not
 failing. If your pipeline isn't discarding the overwhelming majority of its own
 output, it's generating rather than hunting.
 
+### Phase 3.5 — Cascade (before anything is written up)
+For each `CONFIRMED` finding, ask the two cascade questions:
+*"How can I detect similar behavior elsewhere?"* and *"Does the origin enable other
+attacks?"*
+
+Variant-hunt the root-cause **shape** across the target, and attempt escalation. **Never
+let the first version of a finding go to report unescalated** — the escalated version pays
+more and duplicates less. Update `recon/coverage.md` with any new surfaces this opens.
+
 ### Phase 4 — Re-verify
 For each `CONFIRMED` record, spawn a **second** fresh verifier that did not hunt it
 and did not validate it. If it materially disagrees — any promotion to a stronger
@@ -134,8 +143,10 @@ chain, the evidence, preconditions, and the proposed severity cap.
 does, by actually reading it.
 
 ### Phase 6 — Report
-Only for findings the user has reviewed and approved, delegate to the
-`report-drafter` subagent. Output to `reports/`. **A human submits it.**
+Only for findings the user has reviewed and approved, invoke the **`report-writer`**
+skill (platform-specific: it encodes the per-platform state machines, reputation costs and
+triager rubrics) or delegate to the `report-drafter` subagent. Output to `reports/`.
+**A human submits it.**
 
 ## Budget discipline
 

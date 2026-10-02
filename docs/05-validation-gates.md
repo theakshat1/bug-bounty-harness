@@ -185,6 +185,25 @@ plus raw evidence.
 
 You, personally, reading it. No exceptions, no automation.
 
+### Gate 7 — Cascade (before you report, not after)
+*What else does this finding tell you?*
+
+After **any** confirmed finding, two mandatory questions:
+
+> **"How can I detect similar behavior elsewhere?"**
+> **"Does the origin enable other attacks?"**
+
+Rationale: *"When you make a significant research discovery, it may contain a clue to
+something conceptually nearby."* This is documented as the single place where human
+judgment beats autonomy by the widest margin — *"the true value of an autonomous research
+system is unlocked by putting a researcher in the loop in exactly one place — the
+discovery cascade."*
+
+Practically: run variant analysis on your own finding's root-cause shape before
+submitting. **Never submit the first finding unescalated** — the escalated version is
+worth more and is far less likely to be a duplicate.
+→ [11 §G13](./11-non-obvious-thinking.md)
+
 ---
 
 ## 5.4 The disprove prompt
@@ -257,6 +276,28 @@ before you invest in better prompts.
 | Subdomain takeover | Oracle: you serve a unique nonce on the dangling host and fetch it back over the victim hostname. |
 | Race condition | N parallel attempts. Oracle: final state is arithmetically impossible under correct locking (e.g. balance > sum of deposits). |
 | Path traversal | Oracle: response contains content from a file your test account provably does not own. |
+
+### Make the oracle expectation-free
+
+The sharpest oracle-design idea from 2026 research, and the one worth generalizing:
+
+> *"This system has no expectations about what the poisoned response should look like,
+> which means it can detect **any kind** of cross-request contamination."*
+> — HTTP Terminator
+
+**Assert that a boundary was crossed, not that the response contains a particular
+string.** An oracle that checks `response contains "<marker>"` finds only what you
+predicted. An oracle that checks *"this response belongs to a different request than the
+one I sent"* finds classes you never hypothesized.
+
+Applied to the table above: for IDOR, assert *"the body contains data not owned by this
+token"* rather than matching one canary field. For cache poisoning, assert *"a clean
+client received content it should never see"* rather than matching your specific marker.
+For races, assert *"the final state is arithmetically impossible"* rather than counting
+successes.
+
+This is described as *"the single most transferable AI-era design pattern"* — because it
+is the one oracle shape that detects bugs the hypothesis-generator didn't imagine.
 
 **Rule:** if a class has no deterministic oracle, it needs stronger human review
 before submit, and you should say "manually verified" rather than "validated".
@@ -370,6 +411,7 @@ Print this. A finding ships only when every box is checked.
 [ ] G4 Reproduced twice on authorized target, two owned accounts, minimum data
 [ ] G5 Checked against public disclosures / CVEs / program changelog
 [ ] G6 I read this myself and would defend it to the author
+[ ] G7 Cascaded: variants searched, escalation attempted before reporting
 [ ] Evidence redacted; no third-party PII
 [ ] Severity justified by impact, not by class name
 [ ] Preconditions stated honestly, including the inconvenient ones

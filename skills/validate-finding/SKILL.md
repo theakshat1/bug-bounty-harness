@@ -140,9 +140,16 @@ DUPLICATE_CHECK:
 
 ## After the verdict
 
-- **CONFIRMED** → append to `findings/confirmed.jsonl`. It still needs Gate 6:
-  a human reads it before anything is submitted. Set
-  `"gate_6_human_reviewed": false`.
+- **CONFIRMED** → append to `findings/confirmed.jsonl` with
+  `"gate_6_human_reviewed": false`, then **cascade before anyone writes a report**:
+  - *"How can I detect similar behavior elsewhere?"* — variant-hunt the root-cause
+    **shape**, not the symptom: same sink different file, same invariant different sink,
+    same invariant at a different lifecycle stage, same invariant in a fork or legacy API
+    version.
+  - *"Does the origin enable other attacks?"*
+
+  **Never let the first version of a finding go out unescalated.** The escalated version
+  pays more and is far less likely to be a duplicate.
 - **Anything else** → append to `findings/rejected.jsonl` with
   `kill_reason` and `gate_failed`. This is not waste; it is the negative ledger
   that stops the hunter re-proposing the same dead idea and tells you which gate

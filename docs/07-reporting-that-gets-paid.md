@@ -229,6 +229,11 @@ harness emits these you will look like a farmer even when your bug is real.
 
 ---
 
-**Next:** [05 — Validation Gates](./05-validation-gates.md) ·
+> **For the platform machinery** — exact report states, reputation point values, VRT
+> classification, mediation windows — see
+> [12 — Triage & Report Mechanics](./12-triage-and-report-mechanics.md).
+
+**Next:** [12 — Triage & Report Mechanics](./12-triage-and-report-mechanics.md) ·
+[05 — Validation Gates](./05-validation-gates.md) ·
 [09 — Scope and Ethics](./09-scope-authorization-and-ethics.md) ·
 [06 — Target Selection](./06-target-selection.md)

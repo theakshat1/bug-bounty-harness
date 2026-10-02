@@ -18,8 +18,8 @@ If you read only three documents, read these in this order:
    Why obvious ideas are *negative-value*, and twelve generators that produce
    duplicate-resistant ones. 15 minutes.
 3. **[05 — Validation Gates](./05-validation-gates.md)** — the proving moat. 15 minutes.
-4. **[07 — Reporting](./07-reporting-that-gets-paid.md)** — so a proven, novel bug
-   doesn't die in triage. 10 minutes.
+4. **[12 — Triage & Report Mechanics](./12-triage-and-report-mechanics.md)** — so a
+   proven, novel bug doesn't die in triage. 10 minutes.
 
 Then set up the scope hook (see the [README](../README.md)) and run
 `/bb-harness:hunt-campaign`.
@@ -59,6 +59,9 @@ Then set up the scope hook (see the [README](../README.md)) and run
   methodology, ordered by what pays. Plus the current recon stack.
 - **[07 — Reporting](./07-reporting-that-gets-paid.md)** — what triagers reward and
   punish.
+- **[12 — Triage & Report Mechanics](./12-triage-and-report-mechanics.md)** — exact report
+  states and reputation costs per platform, title and impact conventions, pre-empting
+  Needs More Info, and how to dispute a wrong close.
 
 ### Stay safe and legal
 - **[09 — Scope, Authorization & Ethics](./09-scope-authorization-and-ethics.md)**
@@ -151,4 +154,4 @@ on this topic specifically.
 **Begin:** [09 — Scope & Ethics](./09-scope-authorization-and-ethics.md) →
 [11 — Non-Obvious Thinking](./11-non-obvious-thinking.md) →
 [05 — Validation Gates](./05-validation-gates.md) →
-[07 — Reporting](./07-reporting-that-gets-paid.md)
+[12 — Triage & Report Mechanics](./12-triage-and-report-mechanics.md)

@@ -1,6 +1,6 @@
 ---
 name: hypothesis-forge
-description: Generate non-obvious, duplicate-resistant vulnerability hypotheses for a target by running twelve generators against its specifics, then score each for crowding before any proof effort is spent. Use after recon and BEFORE hunting. This is the step that stops you racing every other hunter's agent to the same findings.
+description: Generate non-obvious, duplicate-resistant vulnerability hypotheses for a target by running generators against its specifics, then score each for crowding before any proof effort is spent. Use after recon and BEFORE hunting. This is the step that stops you racing every other hunter's agent to the same findings.
 argument-hint: "[component-or-surface]"
 ---
 
@@ -40,122 +40,160 @@ Quantity first, judgment second — judging too early collapses you onto the obv
 
 ---
 
-## The twelve generators
+## The generators
 
 Run each. Skip one only if the target genuinely has no such surface, and say so.
+Full evidence and attribution for every one is in `docs/11-non-obvious-thinking.md`.
 
-### G1 · Assumption inversion
-List what the system assumes is true, then negate each.
+### G0 · Pick the surface, not the bug — do this first
+> Mark Dowd: **"The attack surface *is* the vulnerability — finding a bug there is just
+> a detail."** · Orange Tsai: **"A good attack surface achieves twice results with half
+> the effort."**
 
-Look for assumptions in: validation code, type signatures, DB constraints, comments,
-error messages, UI flows that imply an order, and anything the API accepts without
-checking.
+Name the architectural surface you are attacking, and *why nobody has named it before*.
+If you cannot, you are hunting someone else's surface.
 
-Emit: `ASSUMPTION: <x>` → `NEGATION: <y>` → `OBSERVABLE IF BROKEN: <z>`
+Selection question (zhero): *"What technology/component is often present but rarely
+discussed or exploited?"* — maximize **(prevalence in scope) × (minus research
+attention)**. The property you want is "almost systematically in-scope."
 
-### G2 · Defended-treasure inversion
-Find what the developers **defended** — rate limits, captcha, step-up auth, audit
-logging, confirmation emails, extra validation, "DO NOT REMOVE" comments.
+### G1 · Anomaly ledger — the one input no competitor shares
+> Kettle: *"Treat as a lead anything that makes you say **'this makes no sense'**."*
+> *"Spotting anomalies is the single most important skill for finding race conditions."*
 
-Those defenses mark what the team thinks is valuable. Then ask the only question that
-matters:
+Read and append to `recon/anomalies.md`. Log every observation you cannot explain, even
+when it isn't exploitable today — Kettle's whole race-condition class came from a
+**7-year-old** unexplained anomaly. Then ask: *what have I seen that I never explained?*
 
-> **They defended path A to this prize. What is path B?**
+**Benchmark-then-deviate:** establish normal behaviour quantitatively, then look for any
+deviation. Faster than expected ⇒ threading or a short-circuit error path; slower ⇒
+locking.
 
-Password change needs the current password — does *email* change? Admin UI needs MFA —
-does the admin *API*? Export is rate-limited — is the *email digest* carrying the same
-data? Transfers are audit-logged — are *refunds*?
+### G2 · Mine the changelog, issue tracker and release notes
+> joaxcar: *"Reading through the release blog posts (especially the monthly security
+> release) has probably been the most fruitful for me."*
 
-### G3 · Seam hunting
-Enumerate every handoff between two subsystems, then ask whether both sides agree.
+For each disclosed bug: understand the root cause, then **search for edge cases where
+developers missed the protection in similar code.** Read the public issue tracker for
+features you didn't know existed. Follow docs "version history" → epic → merged MR →
+**which files changed** → test there. Read **discussion threads about problems with a
+previous fix** — joaxcar found an access-control bug that had been *reintroduced without
+the developers realising*.
 
-Seams: proxy↔app · router↔handler · parser↔validator · validator↔sink · cache↔origin ·
-app↔db · service↔service · client↔server · auth layer↔app layer · queue↔consumer ·
-frontend normalization↔backend normalization.
+~3–8% of a program's fixed bugs regress. Near-duplicate-free lane.
 
-Agreement about: encoding · length/truncation · type (scalar vs array vs null) · case ·
-unicode normalization · duplicate keys/headers · ordering · identity · time · units.
+### G3 · Variant-hunt every disclosed bug
+40–50% of real in-the-wild 0-days are **variants of already-patched bugs**, because
+*"the execution flow that the proof-of-concept exploits took were patched, but the root
+cause issue was not addressed."*
 
-> The question: **what does one side guarantee, and what does the next side assume?**
+> **The class is public, but the enumeration of its instances is private.**
 
-Nobody owns a seam, which is why bugs live there. Every entry in PortSwigger's 2025
-Top 10 was a seam bug.
+Climb the ladder: exact string → same sink different file → same sink different
+language/service → same **invariant** different sink → same invariant at a different
+**lifecycle stage** → same invariant in a fork, vendored copy, mobile client, or legacy
+API version.
 
-### G4 · Lifecycle tracing
-For each credential and each object, walk:
+### G4 · Build the scanner the paper's author didn't
+> Kettle: *"Did the researcher miss anything? Did they release a scanning tool? If not,
+> can I make one? Does it detect every vulnerability mentioned in the paper?"*
+
+CL.0 desync was *"overlooked by the community"* precisely because **no tool shipped**.
+**The gap between a published technique and a published scanner for it is where
+non-duplicate bugs live.**
+
+And the inversion: after a new technique drops, **the most-saturated assets become the
+best targets**, because they were cleared under the old technique and nobody re-tests.
+
+### G5 · Lifecycle tracing
 `issue → store → transmit → consume → refresh → revoke → audit → export → delete`
 
 Everyone tests **consume**. Prioritize **revoke** (do revocations terminate live
-sessions, websockets, in-flight jobs, cached permissions?), **refresh** (does it
-re-check authorization or trust the old grant?), **export** (does it re-apply the ACL,
-or dump what the query returns?), and **delete** (soft-delete still readable?).
+sessions, websockets, in-flight jobs, cached permissions? *"You cannot revoke a
+self-contained token; you can only outlive it."*), **refresh**, **export** (does it
+re-apply the ACL or dump what the query returns?), **delete**.
 
-### G5 · Follow the data past the obvious sink
-Your input is stored somewhere. Ask **what else reads that store, and does it apply
-the same escaping and authorization?**
+Kettle's collision prediction: *identify objects with security controls, then locate
+**all** endpoints reading/writing them.*
 
-Derived copies: search indexes · caches (app/CDN/framework-internal) · logs ·
-analytics · email and notification templates · PDF/CSV/XLSX exports · webhooks ·
-backups/replicas · audit trails · mobile sync · admin dashboards · **support-agent
-views** · LLM/RAG context.
+### G6 · Hunt seams, not components
+> **Two components can each be individually correct and the seam still be exploitable —
+> which is exactly why single-component scanners never see it.**
 
-### G6 · Second-order and temporal
-For each state-changing operation, ask what happens when it is: twice · concurrently ·
-out of order · while something else is in flight · after a revocation · then undone ·
-partially failed · retried · at a boundary (midnight, month end, quota reset, trial
-expiry).
+proxy↔origin · CDN↔app · framework↔runtime · ORM↔DB · serializer↔deserializer ·
+unicode normalizer↔validator · auth service↔resource service · router↔handler ·
+cache↔origin · queue↔consumer.
 
-**Heuristic: anything with a limit is a race target.**
+At each seam: do both sides agree about encoding · length/truncation · type · case ·
+normalization · duplicate keys/headers · ordering · identity · time · units?
+**What does one side guarantee, and what does the next side assume?**
 
 ### G7 · Cross-feature composition
-A is safe, B is safe — test **A∘B**. Enumerate feature pairs touching the same state or
-the same identity.
+A is safe, B is safe — test **A∘B**. Enumerate feature *pairs* touching the same state or
+identity: SSO × invite · export × templating · cache × personalization · impersonation ×
+audit · soft-delete × re-invite · rate-limit × retry.
 
-Prioritize this generator: a bug requiring two parts seen at once is a bug that
-**partitioned agents miss by design**, which makes it duplicate-resistant against
-exactly your competition.
+Prioritize this: **a bug requiring two parts seen at once is one that partitioned agents
+miss by design.**
 
-### G8 · Actor × object-state matrix
-Build the matrix; look at cells nobody populated.
+### G8 · Workflow / order inversion
+> Douglas Day: *"Instead of going through the prescribed workflow … **what if I reverse
+> the process?** What would happen if I change some of the data that feeds the engine?"*
 
-Actors (the weird ones are the point): anonymous · invited-not-accepted · member ·
-admin · owner · **suspended** · **deleted** · **former member** · service account ·
-API-key-only · SSO user · local-password user · user in two orgs · mid-migration ·
-impersonating staff · partner.
+Run the intended step order out of order, skip steps, repeat steps, run two orders
+concurrently. Also: twice · after a revocation · then undone · partially failed · retried ·
+at a boundary (midnight, month end, quota reset, trial expiry).
 
-Object states: draft · active · archived · soft-deleted · expired · locked ·
-pending-approval · over-quota.
+**Anything with a limit is a race target.**
 
-The interesting cell is almost always **weird actor × weird object state.**
+### G9 · Model the developer's corner-cutting
+> Inti: *"**what are the things that they may try to cut corners on because it's not
+> super relevant to their business?**"*
 
-### G9 · History as oracle
-Changelog, release notes, new JS routes, git history if available.
+Rank features by **(security consequence) ÷ (business centrality)**; hunt the
+high-consequence / low-centrality quadrant. Read *all* the docs and API docs. **Read
+their job postings** — they reveal where the company puts its resources.
 
-**Recently shipped = fewer eyes** (cheapest novelty edge there is). Recently fixed =
-new code under time pressure, plus unfixed siblings. Reverted commits. `TODO`/`FIXME`/
-`HACK` and defensive comments. Migration dual-write windows. Deprecated-but-live paths.
+Related: treat each control as a *confession* of what the team believed the attack was,
+then ask what other path reaches the same asset without that control on it.
 
-### G10 · The un-demoed feature
-What would never appear in a sales demo? Export/print · archive/restore · undo · bulk
-import · migration tools · GDPR export · account deletion · billing edges (proration,
-refunds, downgrade, failed payment) · admin audit log · email digests · file
-preview/thumbnail · deprecation paths · webhook management · API key rotation.
+### G10 · The boring/hard-stuff filter
+> Rosén: **"Focus on BORING/HARD STUFF, other hackers won't."** · zhero: *"Move toward
+> what others avoid."* · Kettle: *"If a technique has a reputation for being difficult,
+> fiddly, or dangerous, that's a topic in dire need of further research."*
 
-> **If a feature has no screenshot on the marketing site, it probably has no test either.**
+Rosén worked through **all 80 integrations** in the docs → one faulty implementation →
+**$20k**. Rank candidate work by how much other hunters would hate doing it.
+**Treat inconvenience as a duplicate-rate discount.**
 
-### G11 · Scope archaeology
-What's in scope that nobody thinks of as the product? Acquired-company infrastructure
-(richest seam — different conventions, orphaned ownership) · regional/localized
-deployments · mobile-only and desktop-only endpoints · partner portals · status pages ·
-docs sites with authenticated sections · developer sandboxes · older API versions ·
-non-English surfaces where validation was reimplemented.
+### G11 · Out-of-band sources agents ignore
+Agents *"didn't consider accessing this public data source"* (Wiz). A human found an
+exposed `/rabbitmq/` in 5 minutes that an agent missed across ~500 tool calls.
 
-### G12 · Fresh technique application
-Is there a technique published in the last ~3 months that applies here and that the
-crowd hasn't applied yet? Novelty has a half-life; by the time it's a nuclei template
-it's a crowding signal, not an opportunity.
+GitHub repos and gists · package registries · archived docs (Wayback CDX) · job ads ·
+Crunchbase acquisitions · CT logs · app-store binaries · support forums · status pages ·
+orphaned git history (zero-commit force-push events).
 
----
+### G12 · Micro-inspiration against spec text
+Feed **1–3 sentence fragments** of RFCs/specs — not whole documents — because *"models
+aggressively anchor on all context provided, so every extra sentence of prompt risks
+context-contamination."* Ask a narrow high-value question and **explicitly exclude
+low-value answers**.
+
+**A standards document is un-mined precisely because reading it is boring.**
+
+### G13 · Cascade (runs after a hit, not during ideation)
+After **any** confirmed finding, two mandatory questions:
+> **"How can I detect similar behavior elsewhere?"** · **"Does the origin enable other
+> attacks?"**
+
+*"When you make a significant research discovery, it may contain a clue to something
+conceptually nearby."* **Never submit the first finding unescalated.**
+
+### Prioritization
+Highest yield and least-run by others: **G0, G1, G2, G3, G4, G5-revoke, G7, G10.**
+G2 and G3 are near-zero-cost and phone-doable — run them first on any target with public
+disclosures or release notes.
 
 ## Scoring — the Obviousness Filter
 
@@ -167,6 +205,10 @@ is to stop you spending proof effort on a race you'll lose.
 2. Would a scanner or nuclei template find it?
 3. Is it the textbook first move for this surface?
 
+Remember the sharper axis: **how many independent observations are needed before this bug
+becomes visible at all?** One observation, no state, no domain knowledge → everyone finds
+it.
+
 Any "yes" → the hypothesis starts at a heavy penalty and needs a real angle to survive.
 
 ### Crowding score
@@ -175,18 +217,21 @@ Any "yes" → the hypothesis starts at a heavy penalty and needs a real angle to
 |---|---|
 | A scanner/nuclei template would find it | **+3** |
 | Textbook first move for this surface | **+3** |
-| Surface is linked from main UI navigation | **+2** |
+| Reachable **unauthenticated** | **+2** |
+| Surface linked from main UI navigation | **+2** |
 | This class already appears in the program's public disclosures | **+2** |
-| Zero auth, zero setup | **+1** |
-| Single request, no chain | **+1** |
+| Single observation — one request/response, no state | **+2** |
 | Requires ≥2 chained steps | **−2** |
 | Requires knowing what the business actually does | **−3** |
+| **Post-authentication, deep feature** | **−2** |
 | Requires a non-default account state | **−2** |
 | Requires reading JS/source/mobile binary to know it exists | **−2** |
 | Feature shipped in last 90 days | **−2** |
 | Lives at a seam between subsystems | **−2** |
 | API-only, never reachable via UI | **−2** |
+| Requires **out-of-band** data (GitHub, archives, job ads, app binary) | **−2** |
 | Requires a second tenant to observe | **−1** |
+| Other hunters would find the work **tedious** | **−2** |
 
 **Negative total → pursue. Zero or positive → you're racing.** Either find an angle
 that makes it non-obvious, or move on.
