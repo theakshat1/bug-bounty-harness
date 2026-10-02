@@ -29,6 +29,17 @@ A hunting agent pointed at a real target produces findings at roughly this ratio
  └─   1  actually payable
 ```
 
+Note which bucket is the expensive one. The 60 hallucinations die cheaply at Gate 1.
+The **4 duplicates survive every gate** — you pay recon, hunting, reachability, impact
+analysis, proof *and* write-up, then collect nothing. In an AI-saturated market that
+bucket is much larger than 4: of the ~1,060 reports in the one public agent dataset,
+**208 were duplicates and 209 informative.**
+
+That is why this document is only half the system. Validation stops you submitting
+what's *wrong*; [11 — Non-Obvious Thinking](./11-non-obvious-thinking.md) stops you
+submitting what's *already known*, and it has to run first because it's the one that
+governs where the budget goes.
+
 Submitting the 100 destroys your reputation and the program's trust. Submitting
 the 1 gets you paid. Everything below is about building the sieve.
 
@@ -153,6 +164,21 @@ plus raw evidence.
 - Check CVE/advisory feeds for the component and version.
 - If it's a known class on a sibling endpoint, that's often still payable — but
   say so up front; it builds credibility and pre-empts a duplicate close.
+
+> ⚠️ **This gate is placed badly on purpose, and you should not rely on it.**
+>
+> By the time a candidate reaches Gate 5 you have already paid for recon, hunting,
+> reachability analysis and proof. Discovering *here* that fifty other agents found the
+> same thing means you spent the whole pipeline for nothing — and unlike a false
+> positive, a duplicate passes every other gate, because it's real.
+>
+> The crowding check therefore belongs **before hunting**, as a budget gate, not here
+> as a quality gate. Gate 5 is the last-chance backstop; the real filter is the
+> **Obviousness Filter** in [11 — Non-Obvious Thinking](./11-non-obvious-thinking.md),
+> run at hypothesis time via the `hypothesis-forge` skill.
+>
+> Keep Gate 5 — a public disclosure you missed is worth catching late. But if Gate 5 is
+> where you *usually* learn an idea was crowded, your pipeline is mis-ordered.
 
 ### Gate 6 — Human
 *Would you defend this in front of the engineer who wrote the code?*
@@ -336,6 +362,7 @@ See [04 — Harness Architecture](./04-harness-architecture.md) for the wiring.
 Print this. A finding ships only when every box is checked.
 
 ```
+[ ] GN Crowding scored BEFORE proof effort (docs/11) — not obvious, not scanner-findable
 [ ] G0 Asset in scope; technique permitted; rate limits respected
 [ ] G1 Cited location verified by independent read — snippet quoted
 [ ] G2 Unbroken call chain from public entrypoint; every guard accounted for

@@ -14,10 +14,12 @@ If you read only three documents, read these in this order:
 
 1. **[09 — Scope, Authorization & Ethics](./09-scope-authorization-and-ethics.md)**
    — the gate before everything. 10 minutes.
-2. **[05 — Validation Gates](./05-validation-gates.md)** — the moat, and the actual
-   thesis of this knowledge base. 15 minutes.
-3. **[06 — Target Selection](./06-target-selection.md)** §6.1–6.2 — where the money
-   is, and what to stop hunting. 5 minutes.
+2. **[11 — Non-Obvious Thinking](./11-non-obvious-thinking.md)** — the core principle.
+   Why obvious ideas are *negative-value*, and twelve generators that produce
+   duplicate-resistant ones. 15 minutes.
+3. **[05 — Validation Gates](./05-validation-gates.md)** — the proving moat. 15 minutes.
+4. **[07 — Reporting](./07-reporting-that-gets-paid.md)** — so a proven, novel bug
+   doesn't die in triage. 10 minutes.
 
 Then set up the scope hook (see the [README](../README.md)) and run
 `/bb-harness:hunt-campaign`.
@@ -32,6 +34,11 @@ Then set up the scope hook (see the [README](../README.md)) and run
   wrong**. Read §1.1 even if you skip the rest.
 - **[06 — Target Selection](./06-target-selection.md)** — payout tiers,
   under-tested surfaces, what's newly open in 2026.
+
+### Think differently (start here — it decides everything downstream)
+- **[11 — Non-Obvious Thinking](./11-non-obvious-thinking.md)** — the duplicate
+  economics, why a checklist cannot make you original, the obviousness filter, the
+  twelve generators, variant analysis, and the anti-patterns that guarantee duplicates.
 
 ### Build the machine
 - **[04 — Harness Architecture](./04-harness-architecture.md)** — the five-element
@@ -60,23 +67,39 @@ Then set up the scope hook (see the [README](../README.md)) and run
 
 ---
 
-## The five things that matter most
+## The six things that matter most
 
 If you internalize nothing else:
 
-### 1. The market pays for *proving*, not *finding*
+### 1. Originality decides what to hunt; validation decides what to submit
+Every hunter has an agent, the agents converge, and a converged finding is a
+**duplicate** — real, proven, and worth nothing. It passes every gate you own and you
+only find out at the end, having paid full price.
+
+**~39% of the one public agent dataset was duplicates and informatives.** So an obvious
+idea is negative-value, and the crowding check belongs at *hypothesis* time.
+
+Practical form — the three questions, asked before you invest:
+*would a generic agent propose this first? would a scanner find it? is it the textbook
+first move?* Any yes means you're racing.
+
+And the corollary that trips people up: **a checklist cannot make you original**,
+because everyone has the same checklist. Generate from *operations on the target*, not
+from a list of bug classes.
+
+### 2. The market pays for *proving*, not *finding*
 Discovery is commoditized — agents do it cheaply, and companies now do it in-house
 at roughly 1/1000th of bounty prices (Shopify: $50–300 per scan producing findings
 worth $400K+ in bounty-equivalent). Confirmation is **not** commoditized: the best
 published automated exploit-confirmation result caps around **30%**.
 
-### 2. Separate the thing that proposes from the thing that confirms
+### 3. Separate the thing that proposes from the thing that confirms
 Never let the component that proposes a bug confirm it. Fresh context, different
 model, inverted instruction (*"disprove this"*), and structurally **unable to file
 findings**. Anthropic measured that fresh context alone roughly **halves** the
 non-exploitable rate.
 
-### 3. Build an oracle outside the model
+### 4. Build an oracle outside the model
 From the AI-slop literature: security experts reason **deductively**, LLMs generate
 **autoregressively**. The gap is **structural, not a prompting problem** —
 chain-of-thought and tool use help but don't close it.
@@ -85,13 +108,13 @@ So: a timer, a created file, a DNS callback, a JS execution context, a canary st
 from a second owned account, a test that flips fail→pass. **A script cannot
 hallucinate.** Prefer any of these over any amount of model judgment.
 
-### 4. Don't compete with agents on their best class
+### 5. Don't compete with agents on their best class
 78% of valid autonomous findings are XSS. Hunt where confirmation requires knowing
 what the application is *supposed* to do — business logic, authorization, auth
 implementation, races, agentic/MCP authorization, compositional multi-commit risk.
 Those are also **duplicate-resistant**.
 
-### 5. Guarantees go in hooks; preferences go in prompts
+### 6. Guarantees go in hooks; preferences go in prompts
 A `PreToolUse` hook can **deny**. A system prompt can only **ask**. Scope
 enforcement, write isolation, and stage-completion gates all belong in hooks. Claude
 Code's own docs say it of output styles: *"It doesn't guarantee that something always
@@ -126,5 +149,6 @@ on this topic specifically.
 ---
 
 **Begin:** [09 — Scope & Ethics](./09-scope-authorization-and-ethics.md) →
+[11 — Non-Obvious Thinking](./11-non-obvious-thinking.md) →
 [05 — Validation Gates](./05-validation-gates.md) →
-[06 — Target Selection](./06-target-selection.md)
+[07 — Reporting](./07-reporting-that-gets-paid.md)

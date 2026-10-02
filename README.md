@@ -9,21 +9,42 @@
 
 ## The thesis
 
-In 2026, finding candidate vulnerabilities is cheap and nearly commoditized.
-**Proving them is the scarce skill.** Three verified facts set the strategy:
+Everyone hunting your target now has an AI agent. Those agents trained on the same
+disclosed reports and run the same playbooks, so **they converge on the same
+findings.** That makes the binding constraint neither tooling nor coverage:
 
-- HackerOne's exploitable rate has held **flat at ~25%** through a **76% volume
-  surge** — so the bottleneck is *triage labour*, not researcher honesty. The market
-  is short of people who can **confirm** bugs, not find them.
-- **78% of *valid* autonomous-agent findings were XSS.** XBOW topped HackerOne's US
-  leaderboard on reputation while earning **under $40,000 total since Feb 2024.**
-- **~70% of critical web vulnerabilities are business logic flaws, and no
-  autonomous agent reliably detects them** — because the intent they violate isn't
-  in the code.
+> **1. Originality decides what to hunt. 2. Validation decides what to submit.**
 
-So this harness is built around a **disprove-first validation ladder** rather than a
-bigger pile of hunting prompts. Everything here exists to kill your own bad findings
-before a program sees them.
+### Why originality first
+A false positive costs you some triage goodwill. A **duplicate costs you the entire
+pipeline** — recon, hunting, validation, proof, writing — and pays nothing. It passes
+every gate you own, because it's *real*. You only find out at the end.
+
+The one public dataset on agent-driven hunting: of ~1,060 reports, **208 were
+duplicates and 209 informative — ~39% of output was work done correctly for zero
+return.** That same account ranked **#1 on HackerOne's US leaderboard** while earning
+**under $40,000 total since Feb 2024.** Volume and correctness weren't the constraint.
+Novelty was.
+
+So an obvious idea isn't merely low-value — it's **negative-value**, and the crowding
+check belongs at *hypothesis* time, before you spend proof budget.
+→ [11 — Non-Obvious Thinking](docs/11-non-obvious-thinking.md)
+
+### Why validation second
+- HackerOne's exploitable rate held **flat at ~25%** through a **76% volume surge** —
+  so the bottleneck is *triage labour*. The market is short of people who can
+  **confirm** bugs, not find them.
+- **78% of *valid* autonomous findings were XSS** — the most crowded, least-paid class.
+- **~70% of critical web vulnerabilities are business logic**, which no autonomous
+  agent reliably detects, because the intent they violate isn't in the code.
+
+Hence a **disprove-first validation ladder** rather than a bigger pile of hunting
+prompts. → [05 — Validation Gates](docs/05-validation-gates.md)
+
+### And the report is the last gate
+A proven, novel bug still pays nothing if a triager closes it as Informative or stalls
+it in Needs More Info. → [07 — Reporting](docs/07-reporting-that-gets-paid.md)
+(a deeper platform-mechanics doc, `12`, is in progress)
 
 ---
 
@@ -53,6 +74,7 @@ reference/   scope template, example .mcp.json, checklists
 | [08 — Vuln Class Playbooks](docs/08-vuln-class-playbooks.md) | Per-class methodology, ordered by what pays |
 | [09 — Scope & Ethics](docs/09-scope-authorization-and-ethics.md) | Read first. The gate before everything |
 | [10 — MCP as Target & Risk](docs/10-mcp-as-target-and-risk.md) | A paying surface, **and** how your own harness gets you banned |
+| [11 — Non-Obvious Thinking](docs/11-non-obvious-thinking.md) | **The core principle.** Twelve generators for duplicate-resistant hypotheses, and the obviousness filter |
 
 ### The skills
 
@@ -60,6 +82,7 @@ reference/   scope template, example .mcp.json, checklists
 |---|---|
 | `/bb-harness:hunt-campaign` | Orchestrates a full campaign with gates between phases |
 | `/bb-harness:scope-guard` | **Gate 0.** Scope verification + builds the enforced allowlist |
+| `/bb-harness:hypothesis-forge` | **Originality engine.** Runs 12 generators, scores every idea for crowding |
 | `/bb-harness:recon-surface-map` | Attack-surface inventory, route map, coverage ledger |
 | `/bb-harness:authz-hunt` | IDOR/BOLA/BFLA/BOPLA, shadow API versions, tenant isolation |
 | `/bb-harness:validate-finding` | **The moat.** Adversarial disprove ladder |
@@ -69,6 +92,7 @@ reference/   scope template, example .mcp.json, checklists
 
 | Agent | Role |
 |---|---|
+| `ideator` | Invents non-obvious hypotheses. **No obligation to prove anything** — that's what keeps the ideas strange. |
 | `hunter` | Proposes candidates for **one narrow slice**. Never verdicts. |
 | `disprover` | Fresh context, different model, **tries to refute**. Cannot file findings. |
 | `recon-mapper` | Maps surface. Does not hunt or exploit. |
@@ -143,10 +167,11 @@ echo '{"tool_name":"WebFetch","tool_input":{"url":"https://api.example.com/"}}' 
 ## Quickstart
 
 ```
-1. Read docs/09 (scope & ethics) and docs/05 (validation gates).      ~20 min
+1. Read docs/09 (scope), docs/11 (originality), docs/05 (validation).  ~35 min
 2. /bb-harness:scope-guard <target>        → builds scope/ + allowlist
 3. Enable the hook, verify it blocks.                 ← do not skip
 4. /bb-harness:hunt-campaign <program>     → orchestrates the rest
+     ...which runs ideation FIRST, so you hunt uncrowded ideas
 5. Read every confirmed finding yourself.             ← Gate 6, never automated
 6. /bb-harness:regression-sweep <program>  → the surface nobody works
 ```

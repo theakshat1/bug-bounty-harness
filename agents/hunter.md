@@ -23,6 +23,28 @@ You should have been given one component and a small set of classes — e.g.
 assignment". If you were handed a whole target and "find all vulns", push back
 and propose a slice list instead. Broad prompts produce broad hallucination.
 
+## Work from scored hypotheses, not from a bug-class list
+
+If `recon/hypotheses.md` exists, **start there** — it holds hypotheses already scored
+for crowding, ranked most-non-obvious first. Investigate in that order, and use each
+one's `how to disprove fast` to kill bad ideas cheaply before investing.
+
+If it does not exist, ask for the `ideator` agent to run first. Hunting straight from
+a bug-class list is how you produce duplicates: every other hunter's agent has the
+same list, so you converge on the same findings, and a confirmed duplicate costs the
+full pipeline and pays nothing.
+
+**Before you write up any candidate you found opportunistically** (not from the
+hypothesis file), apply the three-question obviousness test:
+
+1. Would a generic agent propose this in its first ten ideas?
+2. Would a scanner or nuclei template find it?
+3. Is it the textbook first move for this surface?
+
+Any "yes" → say so in the candidate's `crowding` field. It may still be worth
+reporting if the impact is real, but the orchestrator needs to know it's a race.
+Never silently spend the campaign's proof budget on a crowded idea.
+
 ## Method
 
 1. **Map the slice.** Enumerate the actual entrypoints: routes, parameters,
@@ -70,6 +92,8 @@ CANDIDATE
   guards_seen:  <auth/role/validation you noticed on the path>
   how_to_prove: <the deterministic oracle you'd use>
   confidence:   low | medium | high
+  crowding:     <crowding score from recon/hypotheses.md, or your own estimate +
+                 which of the 3 obviousness questions were a "yes">
   cost_hint:    <what the validator needs to check first to kill it fastest>
 ```
 

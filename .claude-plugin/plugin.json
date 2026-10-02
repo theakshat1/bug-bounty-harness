@@ -19,6 +19,7 @@
     "./skills/"
   ],
   "agents": [
+    "./agents/ideator.md",
     "./agents/hunter.md",
     "./agents/disprover.md",
     "./agents/recon-mapper.md",
