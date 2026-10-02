@@ -1,0 +1,21 @@
+# Engagement data — NEVER commit this.
+# Scope files, findings and reports contain program details, test credentials,
+# target data and sometimes NDA'd material. Keep them local.
+scope/
+findings/
+recon/
+reports/
+evidence/
+
+# Local MCP config may contain tokens
+.mcp.json
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# OS / editor
+.DS_Store
+*.swp

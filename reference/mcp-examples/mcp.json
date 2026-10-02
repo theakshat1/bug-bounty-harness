@@ -1,0 +1,67 @@
+{
+  "_comment": [
+    "Example .mcp.json for an authorized bug bounty engagement.",
+    "",
+    "THE ONE RULE: never combine a target-touching server with a data-bearing or",
+    "write-capable server in the same session. Toxic data flows are ~37% of real MCP",
+    "findings and ~100% of the ways an agentic hunter gets banned.",
+    "",
+    "So: run EITHER the target-touching profile (burp + playwright) OR the",
+    "data profile (hackerone + github). Not both at once.",
+    "",
+    "Put this at your engagement repo root (scope: project) so scope travels with the",
+    "engagement and is reviewable in git. Keep credentials in the environment, never",
+    "as literals here - this file gets committed.",
+    "",
+    "Gotcha: 'url' without 'type' is parsed as stdio and fails. Always set type.",
+    "Env expansion happens at CONNECTION time, so export before launching claude."
+  ],
+
+  "mcpServers": {
+    "burp": {
+      "type": "sse",
+      "url": "http://127.0.0.1:9876/sse",
+      "_comment": "Official PortSwigger MCP. Disable 'allow config editing' in the Burp MCP tab, and deny the set_*_options tools in settings.json - they merge arbitrary JSON into Burp config. Scope auto-approve to your target, never '*'."
+    },
+
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--isolated"],
+      "_comment": "Deterministic multi-step browser control - needed for the two-account IDOR oracle and for proving XSS actually executes. Use a throwaway profile, never your logged-in daily one."
+    },
+
+    "semgrep": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["semgrep-mcp"],
+      "_comment": "Runs entirely locally over stdio - nothing leaves your machine. Lowest-risk code analysis. Do NOT use the hosted mcp.semgrep.ai for client work; it ships your code off-box."
+    },
+
+    "_data_profile_do_not_enable_alongside_burp": {
+      "hackerone": {
+        "type": "http",
+        "url": "https://mcp.hackerone.com/mcp",
+        "_comment": "Official, GA, READ-ONLY by construction - cannot modify reports or program settings. Lowest-risk server available. Use for scope ingestion, duplicate checking, regression leads. NOTE: each client has its own OAuth client_id; the Claude Code CLI id differs from Desktop/Web. Run `claude mcp login hackerone`. Verify the current URL against docs.hackerone.com."
+      },
+      "github": {
+        "type": "http",
+        "url": "https://api.githubcopilot.com/mcp/",
+        "headers": { "Authorization": "Bearer ${GITHUB_PAT}" },
+        "_comment": "Only for source-available targets whose org is explicitly in scope. Scope the PAT ruthlessly - this is the single most dangerous token to hand an agent. NEVER in the same session as target-touching tools."
+      }
+    },
+
+    "_optional_recon": {
+      "censys": {
+        "type": "http",
+        "url": "https://mcp.platform.censys.io/platform/mcp/",
+        "headers": {
+          "Authorization": "Bearer ${CENSYS_PAT}",
+          "X-Organization-ID": "${CENSYS_ORG}"
+        },
+        "_comment": "Passive only. Calls burn credits - an agent loop can drain a quota in minutes. Cost is the real risk here, not security."
+      }
+    }
+  }
+}

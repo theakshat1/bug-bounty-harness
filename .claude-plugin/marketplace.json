@@ -1,0 +1,14 @@
+{
+  "name": "bb-harness-marketplace",
+  "description": "Bug bounty harness plugins for authorized security testing",
+  "owner": {
+    "name": "theakshat1"
+  },
+  "plugins": [
+    {
+      "name": "bb-harness",
+      "source": "./",
+      "description": "Validation-first bug bounty harness: scope enforcement, hunt playbooks, adversarial verification, report drafting."
+    }
+  ]
+}

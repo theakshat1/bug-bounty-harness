@@ -1,0 +1,30 @@
+{
+  "name": "bb-harness",
+  "displayName": "Bug Bounty Harness",
+  "version": "0.1.0",
+  "description": "Validation-first bug bounty harness for authorized testing: scope enforcement, per-class hunt playbooks, adversarial disprove-verification, and report drafting.",
+  "author": {
+    "name": "theakshat1"
+  },
+  "repository": "https://github.com/theakshat1/bug-bounty-harness",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "bug-bounty",
+    "appsec",
+    "vulnerability-research",
+    "authorized-testing"
+  ],
+  "skills": [
+    "./skills/"
+  ],
+  "agents": [
+    "./agents/hunter.md",
+    "./agents/disprover.md",
+    "./agents/recon-mapper.md",
+    "./agents/report-drafter.md"
+  ],
+  "hooks": [
+    "./hooks/hooks.json"
+  ]
+}
