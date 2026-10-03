@@ -203,6 +203,25 @@ architecturally distinct ideas:
 `ZephrFish/harness-kit` is a published template for the recon→hunt→validate→trace→report
 shape, from the same author as this document's epigraph.
 
+### Is harness topology itself a searchable parameter?
+*Synthesizing Multi-Agent Harnesses for Vulnerability Discovery* (AgentFlow,
+**arXiv:2604.20801**) **automatically synthesizes** multi-agent harnesses via a typed
+graph DSL unifying roles, topology, message patterns, tool bindings and coordination
+protocols — so agents, topology, prompts and toolsets become mutable in a single step.
+Reported: **84.3% on TerminalBench-2** and **ten zero-days in Chrome**, including two
+critical sandbox escapes confirmed by Chrome's VRP. **[S — read via secondary summaries,
+not the arXiv PDF; treat the specific figures as unverified.]**
+
+**Take the architectural claim, not the yield.** The claim — that harness topology is a
+*searchable* parameter rather than a hand-designed constant — is a real challenge to any
+fixed design, including this one's 2–3-subagent ceiling.
+
+But the operating envelope is not transferable: an **18-role / ~210-agent** synthesized
+harness running **192 H100s for 7 days**, against a **source-available C++ codebase with
+a VRP**. That is several orders of magnitude outside a solo hunter's budget, and it is a
+different target class from a black-box web app. The 2–3 ceiling in this harness exists
+because of *compaction loss on one machine*, which no amount of topology search fixes.
+
 > ⚠️ One caveat on VVAH-style designs: if a call graph is **seeded by an LLM and reinforced
 > with regex** rather than built from a real AST, dynamic dispatch, reflection and framework
 > routing get missed. **Don't mistake a reachability *claim* for a reachability *proof*** —
@@ -356,6 +375,35 @@ attacker-controlled.**
 Set `omitClaudeMd: true` on agents that read untrusted targets. Managed policies
 still load. This is the same class of risk as prompt injection via HTTP response
 — see [09 §9.4](./09-scope-authorization-and-ethics.md).
+
+#### The citable mechanism: Context Privilege Escalation
+
+*Context Privilege Escalation Attacks against AI Agent Harness* (**arXiv:2609.01222**,
+Indiana University) attacks the **context-assembly layer** — the code deciding what text
+lands in which message role — across **12 real-world agent harnesses**, demonstrating
+*"full agent compromise, remote code execution, denial of service, and manipulated tool
+or skill invocations."* **[V]** Two classes:
+
+- **M-CPE (MessageRole)** — *"attacker-controlled content originating from a
+  low-privileged context is incorporated into a higher-privileged message role."*
+- **X-CPE (Cross-Scope)** — *"attacker-controlled content persists beyond the context in
+  which it was introduced."*
+
+**X-CPE should change how you wire this harness.** It means hostile content does **not**
+need the agent to obey it in-slice. Mere *persistence across scope* is enough — a hostile
+string in a JS bundle comment, an HTTP error body, or a target repo's own `CLAUDE.md`,
+read during one slice, leaking into a later slice's context.
+
+So the rule that the `disprover` never sees the hunter's reasoning is **not only an
+epistemic control against error inheritance. It is a security boundary.** Which sharpens
+the requirement beyond "use a fresh subagent":
+
+> **The validator's context must be *constructed*, not *inherited*.**
+
+Pass it an explicitly assembled set — the claim, the cited locations, the schema — never
+a conversation it was handed. **A fork inherits the parent's context by design, so a fork
+is the wrong primitive for validation**, even though it is cheaper and shares the prompt
+cache.
 
 ### What this harness actually implements
 

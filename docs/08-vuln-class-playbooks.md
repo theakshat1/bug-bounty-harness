@@ -55,6 +55,39 @@ Tooling:
 - **Sub-states** — a user briefly both "unverified" and "has a session"
 - Currency/rounding/negative quantities; discount applied after total; cancel-and-refund ordering
 
+### HTTP/3 reopened the race window — with a rule attached
+*HTTP/3 in Burp Suite* (Tom Stacey, PortSwigger Research, **2026-09-23**) **[V]**: Turbo
+Intruder now speaks HTTP/3 and reaches *"100,000 requests per second over Wi-Fi"* against
+a remote host (vs ~30,000 for HTTP/1.1); Burp Pro gained an **AUTO engine** that picks the
+highest available HTTP version and retunes mid-attack. Two new race techniques: the
+**Single Datagram Attack**, and **server-side race orchestration via QPACK blocked
+streams** — both exploiting HTTP/3's tighter windows.
+
+Also noted there, and squarely a [G6 seam](./11-non-obvious-thinking.md): **HTTP/3
+downgrade attacks remain viable**, with headers injectable during the version transition,
+bypassing controls that don't validate consistency *across* protocol versions. That is
+genuinely under-tested.
+
+> ⚠️ **And the rule.** 100k RPS sits directly against this harness's non-negotiable
+> prohibition on DoS and stress testing — **a 100k-RPS "race condition test" is
+> indistinguishable from a flood**, both to the target's monitoring and to the program's
+> policy. Use the smallest burst that demonstrates the window (single-packet /
+> single-datagram attacks need a handful of requests, not thousands), stay inside the
+> program's stated rate limit, and never raise throughput to compensate for not
+> understanding the race. See §8.1's reliability mechanics — widening the window beats
+> increasing volume.
+
+### A deterministic oracle for the hardest class to prove
+Jann Horn, *Testing race conditions with memory access tracing and stack-based delay
+injection* (Project Zero, **2026-09-08**) **[V]** tackles exactly the problem that makes
+race reports get closed Not Reproducible: **confirming** a race deterministically, via
+memory-access tracing plus stack-based delay injection.
+
+Relevant here because [docs/05 §5.5](./05-validation-gates.md) asks for deterministic
+oracles over model judgment, and a one-shot race is the canonical case where a *reporting*
+defect looks like a research defect. If you can make the race reproducible on demand, the
+"intermittent, could not reproduce" close disappears.
+
 ### What makes a race *reliable* (not just firable)
 Tooling tells you how to fire a race; it doesn't tell you why one lands. Three mechanics,
 from kernel race research: **widen the window** (make the contended operation slower),

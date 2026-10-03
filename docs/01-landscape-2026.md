@@ -34,6 +34,18 @@ What HackerOne actually said (H1 Validation press release, **2026-04-21**): **[V
 - "About **25% of findings were confirmed exploitable, a rate that has held
   steady** despite the surge."
 - Their framing: "the absolute number of real vulnerabilities continues to grow."
+- And a figure worth carrying alongside, because it is the more interesting one:
+  **32% of reported flaws were classed critical or high, up from a historical 26–28%
+  baseline.** A *stable* exploitable rate alongside a *rising* critical/high share is a
+  sharper fact than either alone.
+
+> ⚠️ **Sourcing honesty, downgraded [V] → [S].** A re-check reached only syndicated
+> trade coverage of this announcement, never hackerone.com's own press page — and three
+> outlets carrying it in identical wording are **one wire source wearing three mastheads,
+> not three-source corroboration.** Note too that the statistic was published to launch
+> **h1 Validation**, a product that sells exploitability validation. That doesn't make it
+> false, but HackerOne benefits from "75% of findings aren't exploitable" being believed.
+> Treat as **[S]** until you hold the release itself.
 
 A **flat** signal rate against a 76% larger denominator means the number of *real*
 bugs grew ~76% too. The surge was not mostly noise.
@@ -91,19 +103,25 @@ rubric): **[V]**
 | Platform | What changed | Date | **[V]** |
 |---|---|---|---|
 | **HackerOne** | AI explicitly "permitted and encouraged" across the whole workflow. No AI disclosure required. But: "The use of AI does not change the requirement to **validate findings, connect all steps in an attack chain, and provide a clear, reproducible proof-of-concept demonstrating a real vulnerability and its impact**." | CoC, updated May 2026 | V |
-| HackerOne | **Mandatory identity verification** for all Bug Bounty submissions (web, Report Assistant, API). VDPs stay open without IDV. | phased 2026-08-05 → 08-17 | V |
-| HackerOne | **Severity mandatory at submission** (BBP, VDP, Challenge). Triage routes on it — mis-severity now costs you queue position. | 2026-09-21 | V |
+| HackerOne | **Mandatory identity verification** for Bug Bounty submissions, in three phases: **Aug 5** new accounts · **Aug 14** existing accounts under 150 reputation · **Aug 17** all remaining. VDPs unaffected. Vendor Veriff; valid 12 months. **Auto-rejects VPN/anonymity tools, jailbroken devices, iOS Private Relay, under-18s, and digital or month-old copies** — turn the VPN off before verifying. *(The phase dates exist only in the August 2026 changelog; the id-verification help page carries no dates.)* | phased 2026-08-05 → 08-17 | V |
+| HackerOne | **Severity required at submission by default** (BBP, VDP, Challenge), and triage *"pre-sorts"* on it so critical issues surface sooner. **But programs can opt out in program settings after that date** — so it is a default, not a platform invariant. Check the actual submission form rather than assuming. | 2026-09-21 | V |
 | HackerOne | TriageOne smart routing separates "a highly experienced, trusted researcher from a newly created account backed solely by automated tooling." | 2026 | V |
 | HackerOne | Penalty ladder: reputation hit → rate limiting → **loss of private program eligibility** → extra verification → suspension → removal. Automated delivery from scanners/scripts/browser automation = full ban. | — | V |
-| **Bugcrowd** | Four measures (their term for the problem: *"sloptimism"*): submission-farming bans at **≥10 invalid reports**; **mandatory IDV** for all Managed Bug Bounty; **submission throttling** (caps on concurrent open reports for low-quality accounts); **CAPTCHA on all submissions**. | 2026-05-18 | V |
+| **Bugcrowd (1 of 2)** | Thresholds and bans (their coinage for the problem — *"sloptimism"* — belongs to this post): **permanent ban for submission farming**, reinstatement only by formal appeal plus IDV; **review at ≥10 consecutive invalid reports**, 30-day suspension where attributable to unvalidated AI output; **IDV required at ≥10 invalid reports** as a *penalty*; and **automation "squatting" common finding types at program launch** without demonstrated impact draws enforcement. Context: the triage queue *"grew by 334% in a three-week stretch."* | **2026-03-10** | V |
+| **Bugcrowd (2 of 2)** | Universal controls: **IDV becomes a precondition** — *"mandatory IDV for any hacker who wishes to submit to an MBB program"* (unverified accounts keep VDP access only); **CAPTCHA on all submissions across all engagement types**; **throttling** of in-flight reports for low-performing accounts. | **2026-05-18** | V |
 | Bugcrowd | 30-day suspension for AI-attributed submissions without manual validation at ≥10 invalid. No AI disclosure required. | Nov 2025 CoC | V |
+
+> **Don't collapse those two Bugcrowd rows into one date.** IDV changed *kind* between
+> them: in March it was a **penalty** triggered at ≥10 invalid reports; by May it was a
+> **precondition** for every Managed Bug Bounty submission. Five months apart, two
+> different mechanisms. **[V]**
 | **Intigriti** | **The one platform that requires AI disclosure:** "Be open and transparent about the use of AI." Unverified AI output may be **closed without response**. Also bans placeholder reports filed to claim duplicates. Sanctions include **payment restriction** (keep access, forfeit all rewards). | 2026-03-09 | V |
 | Intigriti | Strategy of **"intelligent friction"**: higher per-category PoC standards, reproduction standards, evidence expectations including **short video**. Explicitly splits the market into *volume reporting programs* (lower pay, automation-tolerant) vs *expert programs* (higher pay, low volume, collaborative). | upd. 2026-08-08 | V |
 | **GitHub** | Program restructured. Public payouts roughly halved; top rates moved to an invite-only VIP tier. Signal threshold on the public program, with ~4 submissions of runway for new researchers. | 2026-07-22, effective 07-27 | V |
 | GitHub | Earlier bar-raising: **working PoC** ("Show us the impact, don't just describe it"), scope awareness, tool validation. Low-impact findings now get **swag instead of bounty**. | 2026-05-15 | V |
 | **GitLab** | New reproduction-artifact requirement attributed directly to AI-generated submissions; reports lacking verifiable evidence closed as N/A. | 2026 | V |
 | **Immunefi** (web3) | Strictest PoC bar in the industry, and it predates the AI wave: a valid PoC must be **runnable attack code** (Foundry/Hardhat test, or a contract whose functions trigger the exploit). Structurally slop-proof. | ongoing | V (no dated 2026 AI policy found — **[U]**) |
-| Others that retrenched | Intel suspended a program paying up to $100K → moved to Intigriti **rewardless** disclosure (~Sept 2026, Intel gave no public reason **[U]**). curl ended bounty payments. Nextcloud suspended paid rewards citing AI volume. Linux kernel security list called "almost entirely unmanageable" by Torvalds. | 2026 | V/S |
+| Others that retrenched | Intel suspended a program paying up to $100K → moved to Intigriti **rewardless** disclosure (surfaced 2026-09-19; Intel published no rationale, and the widely-repeated "AI slop" explanation is journalists' inference by analogy to curl and Nextcloud, **not an Intel statement** **[U]**). curl ended bounty payments. Nextcloud suspended paid rewards citing AI volume. Linux kernel security list called "almost entirely unmanageable" by Torvalds. | 2026 | V/S |
 
 ### GitHub's VIP ladder — the clearest published path to premium tiers **[V]**
 
@@ -159,11 +177,27 @@ decision available in 2026.** See [06 — Target Selection](./06-target-selectio
   misconfiguration, default credentials, standard SQLi/XSS/traversal.
 - Agents consistently miss: business logic, multi-step chains, GUI-dependent
   bugs, genuinely novel issues.
-- **ARTEMIS** placed highly against professional pentesters on a live 8,000-host
-  network but produced **higher false-positive rates than every human
-  participant**. Cost near parity with human testers. **[S]** — two sources give
-  contradictory figures ($18/hr beating 9 of 10 humans vs $59/hr placing 2nd);
-  **don't cite either number.**
+- **ARTEMIS** — the two figures this document previously refused to cite turned out to
+  be **two halves of the same paper**, now resolved to a primary source:
+  *Comparing AI Agents to Cybersecurity Professionals in Real-World Penetration Testing*,
+  **arXiv:2512.09882** (Stanford/CMU/Gray Swan, submitted 2025-12-10, rev. 2026-03-03).
+  **[V]**
+
+  Against 10 security professionals and 6 other agents on a live ~8,000-host network:
+  ARTEMIS **placed 2nd overall**, **outperformed 9 of 10 human participants**, found
+  **9 valid vulnerabilities at an 82% valid submission rate**, and some variants cost
+  **$18/hour vs $60/hour** for professional testers. (The `$59` figure circulating in
+  secondary coverage is wrong.) Its named weaknesses: **higher false-positive rates** and
+  **GUI-based tasks**.
+
+  > ⚠️ **Two caveats before you over-read this.** It was a **university network
+  > penetration test**, not a bug bounty program — the task was pentest-style breadth,
+  > not duplicate-avoiding bounty hunting, so it says nothing about where an agent would
+  > place on a bounty leaderboard. And note what the winning scaffold contained:
+  > **automatic vulnerability triaging** as a named component. The 82% valid rate is the
+  > number to beat, and "higher false-positive rates" is the headline agent weakness —
+  > which is the strongest external evidence this KB has for
+  > [the disprove ladder](./05-validation-gates.md).
 
 > *"Every headline success included human review before submission."*
 

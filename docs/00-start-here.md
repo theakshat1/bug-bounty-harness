@@ -125,6 +125,24 @@ happens or never happens."*
 
 ---
 
+## Two sourcing rules that have each bitten this KB
+
+Both of these caused real errors that had to be corrected, so they're rules now:
+
+1. **Platform changelogs beat trade press on platform mechanics.** HackerOne's identity-
+   verification rollout was three phases (Aug 5 / 14 / 17, the middle one scoped to
+   accounts under 150 reputation). Essentially the entire trade press reduced it to a
+   single "August 14". The changelog was right; the coverage wasn't.
+2. **Watch for wire syndication masquerading as corroboration.** Three outlets carrying a
+   story in *identical wording* are one wire source wearing three mastheads. Finding "three
+   sources" that agree verbatim is evidence of syndication, not of verification.
+
+And a third, from an error of my own: **check whether two documents are describing the
+same mechanic before calling them contradictory.** This KB previously claimed HackerOne's
+docs were internally inconsistent about Informative and Signal. They aren't — the
+*Reputation* page lists Informative as 0 reputation, the *Signal* page excludes Informative
+from Signal. Two different mechanics, one phantom contradiction.
+
 ## How claims are labelled
 
 - **[V]** — verified against a primary source (platform press release, changelog,

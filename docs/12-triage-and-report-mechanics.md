@@ -102,7 +102,15 @@ Source: [Reputation](https://docs.hackerone.com/en/articles/8369865-reputation)
 | Spam | **−10** |
 
 Starting reputation **100**; cannot go below **0**; **duplicate chains cap at three** —
-the 4th+ duplicate earns 0.
+the 4th+ duplicate earns 0. **Reports submitted to Essential VDPs earn no reputation at
+all** — reputation-neutral on both the upside and the downside, which matters for target
+selection. **[V]**
+
+> **The duplicate sign flip is the actionable one, and it is checkable in advance.**
+> A duplicate of a resolved report is **+2 if you filed before the original went public**
+> but **−5 if you filed after**. So submitting a duplicate of an already-publicly-
+> disclosed resolved report is a *guaranteed* −5 — and Hacktivity tells you which reports
+> are public before you submit. Check it. **[V]**
 
 **Bounty reputation** (separate): ≥ mean + 1SD → **+50**; > mean → +25; ≥ mean − 1SD →
 +15; below → +10. *"The first 10 bounties of a program will be rewarded the BOUNTY_LOW
@@ -122,10 +130,32 @@ reputation."* **[V]**
 
 > **A single −5 N/A near 0 Signal can lock you out of Strict programs for up to 365
 > days.** Trial reports make every early submission a Signal bet.
+>
+> Note the mechanism precisely: **reputation cannot fall below 0, but Signal can** (its
+> scale is −10 to 7). So the lockout runs through **Signal**, not reputation. **[V]**
 
-**[U]** HackerOne's docs are internally inconsistent on whether Informative is excluded
-from Signal (prose) or included at weight 0 (formula, which dilutes downward). Treat
-Informative as mildly Signal-diluting and avoid it.
+### ✅ Correction — Informative does NOT dilute Signal
+
+An earlier version of this document claimed HackerOne's docs were internally
+inconsistent about whether Informative counts toward Signal. **That was wrong, and the
+error is worth naming so it doesn't come back.**
+
+Both Signal pages state it plainly and without contradiction **[V]**:
+
+> *"These reports won't affect your Signal: 1. Self-closed 2. Duplicate 3. Informative"*
+
+**Informative is excluded from Signal entirely.** The phantom inconsistency came from
+conflating two different documents: the **Reputation** page lists `Informative | 0`,
+which is a *reputation value*, not a *Signal weight*. Reputation-0 and
+Signal-excluded are different mechanics.
+
+Avoiding Informative is still right — it earns 0 reputation, 0 bounty, and is where a
+30-day-stalled Needs More Info lands — but **not** because it drags Signal down. It
+doesn't.
+
+> ⚠️ Freshness caveat: both Signal pages were last updated **2024-07-17** and no 2026
+> changelog touches Signal. The mechanic looks stable rather than merely undocumented,
+> but the docs themselves are two years old.
 
 **90-day leaderboard / invites:** `Reputation × Signal Percentile × Impact Percentile`;
 requires positive reputation gain, **non-negative Signal**, and zero CoC violations in
@@ -173,9 +203,13 @@ Once **Triaged**, you can only add comments — **you cannot edit a submitted re
 ## 12.3 Bugcrowd
 
 ### VRT is primary; CVSS is support
-Current version **1.19.1, released 2026-07-08** **[V]**. Canonical:
-[bugcrowd.com/vrt](https://bugcrowd.com/vrt) ·
-[GitHub](https://github.com/bugcrowd/vulnerability-rating-taxonomy)
+Current version **1.19.1, released 2026-07-08** — re-verified 2026-10-03, still latest.
+**[V]** Canonical: [bugcrowd.com/vrt](https://bugcrowd.com/vrt) ·
+[GitHub releases](https://github.com/bugcrowd/vulnerability-rating-taxonomy/releases)
+
+> **Use the GitHub releases page as the version source of truth.** `docs.bugcrowd.com`'s
+> own researcher changelog is stale on VRT — its body still lists 1.17 (Aug 2025) as
+> newest while its index references 1.19.1.
 
 Structure is **Category → Sub-Category → Variant**. **Select the deepest matching
 Variant, not the Category**, and cite its name in your report.
@@ -192,7 +226,7 @@ And the caveat, verbatim: *"the severity rating suggested by VRT is not guarante
 be the severity rating applied."* **[V]**
 
 Recent VRT changes: 1.19.1 added Active Directory misconfigurations, Kerberos/SCCM
-abuse, server misconfigurations, and streamlined SSRF classifications; 1.18 (Feb 2026)
+abuse, server misconfigurations, and streamlined SSRF classifications; 1.18 (**2026-03-09**)
 added an OAuth Account Squatting variant at P4 and downgraded all Flash entries to P5.
 
 ### P1–P5 **[V]**
@@ -212,6 +246,13 @@ Valid: Unresolved, Resolved, Informational
 
 **Private program invitations require >50% accuracy within a 90-day period.** **[V]**
 
+Source: [understanding-substates](https://docs.bugcrowd.com/researchers/reporting-managing-submissions/understanding-substates/).
+(The older `/performance-metrics/accuracy/` path now 404s.) The current substates table
+classifies **Informational as Valid**; **Won't Fix is not a listed substate at all**, so
+the older "Won't Fix is valid" framing is superseded terminology rather than a competing
+fact. **Duplicate** does not appear in the table either, so its Accuracy treatment is
+unsourced — don't assume.
+
 Practical reading: **Informational/P5 protects your Accuracy. Out of Scope and Not
 Reproducible destroy it.**
 
@@ -220,11 +261,24 @@ Reproducible destroy it.**
 > race, state you consumed, or a bug fixed before triage reached it — not a research
 > defect.
 
-**Won't Fix** still pays kudos: *"submissions that are moved to a 'won't fix' substate
-will have the appropriate kudos points assigned based on prioritization."* **[V]**
+**Won't Fix** reportedly still pays kudos: *"submissions that are moved to a 'won't fix'
+substate will have the appropriate kudos points assigned based on prioritization."*
+**[S — the quote is real, but "Won't Fix" is absent from the current substates doc, so
+this may describe retired terminology. Verified as a quote, not as current behavior.]**
 
-**Kudos [U]** — P1 40 (dup 10) · P2 20 (dup 5) · P3 10 · P4 5 · P5 0. Note Bugcrowd
-**does pay partial kudos on P1/P2 duplicates**, unlike HackerOne.
+**Kudos [V — docs.bugcrowd.com "Getting rewarded", retrieved 2026-10-03]**
+
+| Priority | First to find | Duplicate |
+|---|---|---|
+| P1 Critical | 40 | **10** |
+| P2 High | 20 | **5** |
+| P3 Moderate | 10 | 0 |
+| P4 Low | 5 | 0 |
+| P5 Non-exploitable | 0 | 0 |
+
+*"You must be the first person to report the bug to earn all possible points."* So
+Bugcrowd **does** pay partial kudos on duplicates, unlike HackerOne — but **only at P1
+and P2**. A duplicate at P3 or below pays nothing at all.
 
 ### Things worth knowing
 - **The ASE team edits submissions, and the edit is what the customer reads.** **[V]**
@@ -355,13 +409,44 @@ Spam · **RTFS** ("Read The Fine Scope").
 **Valid:** Won't Fix (may include reward) · Informative (reward still possible) ·
 Accepted (reward issued) · Resolved.
 
-### Points **[U — traces to a Feb 2021 post; 2026 values unverified]**
-Bounty points 5–50 by tier · **quality rating +1 to +5 awarded by the program owner for
-report quality** · **+1 when your CVSS scoring is appropriate** · +7 for a resolved bug.
+### Points **[V — helpcenter leaderboard page, updated 2026-04-08]**
 
-**If still current, YesWeHack is the only platform that pays you points directly for
-report-writing quality and for correct CVSS scoring** — which makes careful
-self-scoring there directly profitable rather than merely risky. Treat as directional.
+**Report status:** `+7` accepted **and** resolved · `+1 to +12` for a duplicate
+(**25% of the original report's points**) · **`−3 to −10` for (recurring) invalid
+reports** · **`−1` for a report sitting in Need More Information**
+
+**Report quality:** `+1` for **correct CVSS scoring** · `+1 to +5` for PoC clarity,
+additional detail, screenshots
+
+**Reward points: a convex formula, not a flat tier table.** Within the middle bands,
+points scale with the **square** of the bounty:
+
+```
+Low       bounty ≤ 100          → 5 points
+Medium    100 < bounty ≤ 500    → 5  + 10 × (bounty² / 500²)    →  5–15 points
+High      500 < bounty ≤ 1500   → 15 + 15 × (bounty² / 1500²)   → 15–30 points
+Critical  bounty > 1500         → 50 points
+```
+
+> ⚠️ The € thresholds are presented in the source as *"the following reward grid as an
+> example"* — **the band boundaries are one program's grid, not platform constants.**
+> The *shape* (quadratic within a band) is the stable part.
+
+Three consequences the other platforms don't have:
+
+1. **Needs More Info is a direct point penalty here (−1)**, not merely a slow leak. §12.7
+   applies with extra force on YesWeHack.
+2. **Invalid reports escalate** (−3 to −10 for *recurring* invalids), which pairs with the
+   RTFS state above.
+3. **Duplicate upside is concentrated in high-bounty findings.** At 25% of the original's
+   points, a duplicate of a ≤100 finding pays ~1 point; a duplicate of a critical pays
+   ~12.
+
+And the standout, now confirmed current rather than directional:
+
+> **YesWeHack is the only platform that pays you points directly for report-writing
+> quality and for correct CVSS scoring.** Careful self-scoring there is directly
+> profitable, not merely risk-avoidance.
 
 ### Their framing questions **[V]**
 > *"Does your Proof of Concept have enough detail to allow anyone to reproduce it?"*
@@ -418,7 +503,9 @@ automated dedupe and severity routing.
 
 NMI is a slow leak: on HackerOne it auto-closes Informative after 30 days (0 bounty,
 0 reputation gain); on Bugcrowd an unanswered report risks **Not Reproducible**, which
-is *invalid* and hits the >50%/90-day private-invite gate.
+is *invalid* and hits the >50%/90-day private-invite gate. **And on YesWeHack it is not a
+leak at all but a direct penalty: `−1` point for a report sitting in Need More
+Information. [V]**
 
 **Answer all sixteen of these in the initial report** — they are the clarifying
 questions derivable from the published rubrics:

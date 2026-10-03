@@ -103,8 +103,27 @@ what triggered platform-wide policy tightening, and it is individually traceable
 to you.
 
 ### Disclose AI assistance when the program asks
-Many programs now require it. Non-disclosure where required is a policy violation
-independent of whether the bug is real.
+Few programs require it. An independent census of 53 programs (Arafat Afzalzada,
+2026-07-28, CC BY 4.0, rubric fixed before reading policy text) found **only 3 require
+AI-use disclosure — and one of those three inverts the requirement**
+**[S — one researcher's dated snapshot, attributed by name]**:
+
+| Program | What it actually asks for |
+|---|---|
+| **Intigriti** | *"be open and transparent about the use of AI and to disclose when and how AI was used"* |
+| **Django** | *"disclose which AI tools were used and what they were used for"* |
+| **FFmpeg** | **not an AI declaration at all** — it asks for *"the name or alias of the human reviewer who verified it"* |
+
+Non-disclosure where required is a policy violation independent of whether the bug is
+real.
+
+> **FFmpeg's variant is the one to internalize.** It is a **named-accountability**
+> control, not a disclosure control — and it is the one requirement an autonomous
+> pipeline **structurally cannot satisfy** without a human actually reading the report.
+> Which is exactly this harness's non-negotiable #2.
+>
+> **If you cannot name the human who verified a finding, you do not have a submittable
+> finding.** A few programs now make that explicit. Treat it as the standard everywhere.
 
 ### Keep the agent inside scope mechanically, not by hope
 An autonomous agent will happily follow a redirect, a link in a JS bundle, or a

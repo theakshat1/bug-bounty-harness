@@ -51,6 +51,25 @@ finite, slow-regenerating resource.
 
 ---
 
+## 5.1b External evidence for this whole document
+
+The strongest independent case for a disprove ladder is the ARTEMIS study
+(**arXiv:2512.09882**, Stanford/CMU/Gray Swan) **[V]**. A multi-agent pentest framework
+run against 10 security professionals on a live ~8,000-host network **placed 2nd overall**
+and **beat 9 of 10 humans** — while its two named weaknesses were **higher false-positive
+rates than every human participant** and GUI-based tasks.
+
+Two numbers to hold:
+- **82% valid submission rate** is the bar a well-built agent pipeline cleared — and it
+  was achieved *with* **automatic vulnerability triaging as a named component of the
+  winning scaffold**. A separate validation stage is not an optional refinement; it is
+  part of what made the result.
+- Agents out-perform humans at *finding* and under-perform them at *not being wrong*.
+  **That asymmetry is the entire reason this document exists.**
+
+(Caveat: a university-network pentest, not bounty hunting — the task was breadth, not
+duplicate avoidance, so it says nothing about leaderboard placement.)
+
 ## 5.2 The core principle: separate DETECT from PROVE
 
 Never let the component that proposes a bug be the component that confirms it.

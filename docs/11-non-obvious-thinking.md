@@ -135,6 +135,39 @@ One observation, no state, no domain knowledge → everyone finds it.
 deep-system findings (authn-bypass chains, payment race conditions, multi-tenant
 isolation failure, subscription logic abuse) run $5k–$50k+.
 
+### ⚠️ Correct one tempting over-read: agent findings are not *shallow*
+
+It is easy to read "78% of valid hackbot findings were XSS" and conclude AI-discovered
+bugs are inherently low-severity. **On outcome severity the data says the opposite.**
+
+Google Threat Intelligence Group, *Vulnerability Discovery and Exploitation Trends in the
+AI Era* (2026-09-30) **[V]**:
+
+> *"Exactly 50% of all AI-discovered vulnerabilities result in Remote Code Execution
+> (RCE), compared to just 26% across the broader CVE ecosystem."*
+
+And the risk distribution **inverts** — AI-discovered vs. the rest: Low **39% vs 69%**,
+Medium **58% vs 28%**. GTIG's phrasing: *"AI-discovered vulnerabilities invert this
+distribution."*
+
+**This strengthens Core Rule 1 rather than weakening it.** If agents land high-severity
+bugs at twice the ecosystem rate, then **duplicate risk on high-severity surfaces is
+worse, not better.** You cannot escape the crowd simply by hunting harder bugs — the
+crowd's agents are already there, disproportionately landing RCE. Crowding is about
+*attention*, not severity, and the two are now correlated against you.
+
+Keep two claims that get conflated apart:
+- **AI-written *reports*** are *"often polished but technically shallow"* (HackerOne
+  HPSR) — a report-craft problem.
+- **AI-discovered *findings*** skew *harder* than human-found ones (GTIG) — a
+  **competition** problem, and the one this document addresses.
+
+Two more GTIG figures worth holding:
+- Monthly CVE disclosure **doubled** in 2026: 5,045 (Jan) → 10,477 (Jul) → 10,740 (Aug).
+- **Only 0.23% of disclosed 2026 vulnerabilities (~1 in 431) were ever observed in active
+  exploitation** — the antidote to severity inflation. The overwhelming majority of real,
+  published, CVE-assigned vulnerabilities are never exploited at all.
+
 ### The empirical AI blind spot — exploit it
 Wiz's 2026 benchmark **[V]**: agents solved 9/10 challenges but **failed the one
 requiring looking *outside* the target** (secrets in a public GitHub repo) —
