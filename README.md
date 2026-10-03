@@ -54,9 +54,22 @@ docs/        the knowledge base — 13 researched documents
 corpus/      the PRIVATE seed corpus — a curated idea bank (your edge)
 skills/      8 working Claude Code skills
 agents/      5 subagents, incl. the ideator and the adversarial disprover
-hooks/       PreToolUse scope enforcement + SessionStart state injection
-scripts/     the hook implementations (fail-closed scope guard)
+schema/      the findings record contract, enforced by code
+hooks/       PreToolUse scope guard · SessionStart state · Stop artifact gate
+scripts/     hook implementations + validators + the test suite
 reference/   scope template, example .mcp.json, checklists
+```
+
+### Enforced, not just documented
+
+| Control | Hook | What it stops |
+|---|---|---|
+| Scope | `PreToolUse` | Any host off the allowlist — **including via `mcp__*` tools**, which are the usual bypass. Fails closed. |
+| Findings schema | `Stop` + CLI | A `needs_validation` record carrying a severity; a trace that doesn't start at an entrypoint; a hedged impact sentence on a confirmed finding. |
+| Gate 6 | `Stop` | A report draft built from a finding no human has reviewed. |
+
+```bash
+bash scripts/test-all.sh     # 57 checks across both hooks, manifests, links
 ```
 
 ### Why `corpus/` matters
@@ -165,11 +178,19 @@ tool call is blocked. That's deliberate.
 Verify it works before you trust it:
 
 ```bash
+# off-allowlist host is blocked
 echo '{"tool_name":"WebFetch","tool_input":{"url":"https://not-in-scope.test/"}}' \
-  | python3 scripts/scope-enforce.py; echo "exit=$?"      # expect exit=2 (blocked)
+  | python3 scripts/scope-enforce.py; echo "exit=$?"      # expect exit=2
 
+# and so is an MCP server trying the same thing — this is the bypass most harnesses miss
+echo '{"tool_name":"mcp__burp__send_http1_request","tool_input":{"host":"not-in-scope.test"}}' \
+  | python3 scripts/scope-enforce.py; echo "exit=$?"      # expect exit=2
+
+# in-scope host is allowed
 echo '{"tool_name":"WebFetch","tool_input":{"url":"https://api.example.com/"}}' \
-  | python3 scripts/scope-enforce.py; echo "exit=$?"      # expect exit=0 (allowed)
+  | python3 scripts/scope-enforce.py; echo "exit=$?"      # expect exit=0
+
+bash scripts/test-all.sh                                   # or just run everything
 ```
 
 ---

@@ -134,10 +134,37 @@ report, and it feeds Gate 3 (impact).
 
 ## Step 6 — Make it mechanical
 
-Prompting yourself is not a control. Generate `scope/allowlist.txt` (one host
-pattern per line) and install the `PreToolUse` hook from
-`hooks/scope-enforce.json` so network tool calls against non-allowlisted hosts
-are **hard-blocked** by the harness rather than by your good intentions.
+Prompting yourself is not a control. Generate `scope/allowlist.txt` and let the
+`PreToolUse` hook (`scripts/scope-enforce.py`, shipped with this plugin) hard-block
+out-of-scope hosts.
+
+```
+# scope/allowlist.txt
+*.example.com            # wildcard: apex + any depth of subdomain
+api.target.io            # exact host
+!blog.example.com        # explicit deny — beats any wildcard
+@mcp-local semgrep       # this MCP server never touches the target
+```
+
+**`@mcp-local` matters and is easy to get wrong.** The hook covers `mcp__*` tools,
+because allowlisting `mcp__burp__send_http1_request` permits the *tool* but says nothing
+about which *host* it may reach — an MCP server is otherwise a complete scope bypass. For
+a server that genuinely only runs locally (Semgrep over stdio, a filesystem server), a
+hostname inside the data it analyzes would otherwise look like a target, so mark it
+exempt. **Never mark Burp, a recon wrapper, or anything with a URL parameter as local.**
+
+Verify the hook actually blocks before you trust it:
+
+```bash
+echo '{"tool_name":"WebFetch","tool_input":{"url":"https://not-in-scope.test/"}}' \
+  | python3 scripts/scope-enforce.py; echo "exit=$?"     # expect 2
+echo '{"tool_name":"mcp__burp__send_http1_request","tool_input":{"host":"not-in-scope.test"}}' \
+  | python3 scripts/scope-enforce.py; echo "exit=$?"     # expect 2
+bash scripts/test-scope-enforce.sh                        # full suite
+```
+
+The hook **fails closed**: with no `scope/allowlist.txt`, every outbound network call is
+blocked. That is deliberate.
 
 A hook can deny. A system prompt can only ask.
 

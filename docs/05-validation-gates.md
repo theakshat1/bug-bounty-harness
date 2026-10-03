@@ -431,6 +431,25 @@ See [04 — Harness Architecture](./04-harness-architecture.md) for the wiring.
 
 ---
 
+## 5.8b The schema is the gate
+
+Doctrine that lives only in a prompt is a request. This repo ships the contract as code:
+
+- **`schema/finding.schema.md`** — the three-verdict record shape, with distinct required
+  *and forbidden* fields per verdict. The load-bearing property: a `needs_validation`
+  record **cannot** carry a severity, so a speculative lead can't be laundered into a
+  finding by attaching a number to it.
+- **`scripts/validate-findings.py`** — stdlib-only validator. Closed field set, trace
+  integrity (first hop `entrypoint`, last `sink`), fingerprint stability, `gate_failed`
+  on rejections, and it **rejects hedged impact sentences** on confirmed records.
+- **`scripts/stop-gate.py`** — a `Stop` hook refusing to end a session on malformed
+  findings, or when a report draft exists for a finding no human has reviewed.
+
+```bash
+python3 scripts/validate-findings.py     # validate findings/*.jsonl
+bash scripts/test-all.sh                 # whole harness, including hook tests
+```
+
 ## 5.9 Anti-patterns
 
 | Anti-pattern | Why it fails |

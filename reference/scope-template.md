@@ -30,6 +30,17 @@ Explicitly out of scope. **Denylist beats wildcard, always.** Prefix with `!` in
 !help.example.com          # Zendesk CNAME, third-party operator
 ```
 
+## MCP-LOCAL servers
+MCP servers that never contact the target, so the scope hook skips host checks for them.
+Only for servers you know run locally and never fetch.
+
+```
+@mcp-local semgrep         # local stdio code analysis; hostnames in code are data
+```
+
+⚠️ **Never** list Burp, a recon wrapper, or anything with a URL parameter here — the hook
+covers `mcp__*` tools precisely because those can otherwise send a request anywhere.
+
 ## PERMITTED
 Verbatim from the policy.
 

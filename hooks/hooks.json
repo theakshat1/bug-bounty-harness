@@ -2,7 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "WebFetch|Bash",
+        "matcher": "^(WebFetch|Bash|mcp__.+)$",
         "hooks": [
           {
             "type": "command",
@@ -20,6 +20,18 @@
             "type": "command",
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/session-context.py",
             "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/stop-gate.py",
+            "timeout": 45,
+            "statusMessage": "stop-gate: validating findings artifacts"
           }
         ]
       }

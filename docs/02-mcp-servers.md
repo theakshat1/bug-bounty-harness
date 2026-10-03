@@ -108,6 +108,30 @@ Recommended permission block:
 defense against toxic flows, because it breaks the chain at the capability level
 instead of relying on the model's judgment.
 
+> ### ⚠️ Permission allowlisting is not scope enforcement
+>
+> Allowing `mcp__burp__send_http1_request` says *"this tool may run."* It says
+> **nothing about which host it may contact.** Burp MCP will happily send a request
+> anywhere — so an MCP server is a complete bypass of any scope control that only
+> watches `WebFetch` and `Bash`.
+>
+> **This harness had exactly that hole**, and it is now fixed: the `PreToolUse` scope
+> hook matches `^(WebFetch|Bash|mcp__.+)$` and does deep extraction over MCP tool
+> input — host-ish keys, any `http(s)://` URL at any nesting depth, `Host:` headers
+> inside raw-request fields, and HTTP/2 `:authority` pseudo-headers. See
+> [04 §4.6](./04-harness-architecture.md).
+>
+> If you run any other harness, or you wrote your own hook, **check this specifically.**
+> It is the single easiest scope control to get wrong, because the tool name doesn't
+> look like a network call.
+
+**For genuinely local servers**, mark them exempt rather than loosening the hook —
+`@mcp-local semgrep` in `scope/allowlist.txt` skips host checks for that server, so a
+hostname appearing inside source code being analyzed isn't mistaken for a target.
+**Only ever use it for servers you know run locally and never fetch** (Semgrep over
+stdio, a filesystem server). Never for Burp, a recon wrapper, or anything with a URL
+parameter.
+
 ---
 
 ## 2.3 BurpMCP (community alternative) — swgee

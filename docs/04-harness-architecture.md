@@ -357,23 +357,39 @@ Set `omitClaudeMd: true` on agents that read untrusted targets. Managed policies
 still load. This is the same class of risk as prompt injection via HTTP response
 — see [09 §9.4](./09-scope-authorization-and-ethics.md).
 
-### The scope-enforcement hook
-This is Gate 0, made mechanical. `scripts/scope-enforce.py` in this repo reads the
-`PreToolUse` JSON on stdin, extracts every hostname a `WebFetch` or `Bash` call
-would contact, checks it against `scope/allowlist.txt`, and **exits 2 to block**.
-It fails **closed**: no allowlist means no network egress.
+### What this harness actually implements
+
+Four controls, all wired up and tested — `bash scripts/test-all.sh`.
+
+| Control | Implementation | Enforces |
+|---|---|---|
+| **Gate 0, scope** | `PreToolUse` → `scripts/scope-enforce.py` | Hard-blocks any host not on `scope/allowlist.txt`. **Fails closed**: no allowlist means no egress. |
+| **Findings schema** | `scripts/validate-findings.py` against `schema/finding.schema.md` | Distinct required **and forbidden** fields per verdict, so a `needs_validation` record *cannot* carry a severity. Plus trace integrity, fingerprint stability, and rejection of hedged impact sentences. |
+| **Gate 6, human review** | `Stop` → `scripts/stop-gate.py` | Blocks session end on schema violations, or when a **report draft exists for a finding no human reviewed**. Honors `stop_hook_active`, so it cannot trap a session. |
+| **State re-injection** | `SessionStart` → `scripts/session-context.py` | Puts scope, coverage, the anomaly ledger and the negative ledger back in context after compaction or a resume. |
 
 ```json
 {
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "WebFetch|Bash",
+        "matcher": "^(WebFetch|Bash|mcp__.+)$",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${CLAUDE_PROJECT_DIR}/scripts/scope-enforce.py",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scope-enforce.py",
             "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/stop-gate.py",
+            "timeout": 45
           }
         ]
       }
@@ -381,6 +397,31 @@ It fails **closed**: no allowlist means no network egress.
   }
 }
 ```
+
+#### Covering MCP tools is the part most harnesses get wrong
+
+Note the matcher includes **`mcp__.+`**. A permission-allowlist entry for
+`mcp__burp__send_http1_request` says *the tool may run* — it says **nothing about which
+host it may contact.** So a scope hook that only watches `WebFetch` and `Bash` is
+completely bypassed by any MCP server that can send a request.
+
+**This harness had that hole until it was audited.** The hook now does deep extraction
+over MCP tool input: host-ish keys at any nesting depth, `http(s)://` URLs anywhere in
+any string, `Host:` headers inside raw-request fields, and **HTTP/2 `:authority`
+pseudo-headers** — that last one was a live bypass the test suite caught, because a
+leading colon defeated the key-matching pattern.
+
+It also resolves **target-list files**: `httpx -l targets.txt` hides its hosts in a
+file, so the hook reads the file.
+
+Two deliberate calls: **`WebSearch` is not enforced** (a search doesn't contact the
+target), and **unreviewed confirmed findings do not block session end** (that's the
+normal resting state of a campaign; the violation worth blocking is a report *drafted
+from* one).
+
+`scope/allowlist.txt` directives: `host` · `*.wildcard` · `!deny` (beats wildcards) ·
+`@mcp-local <server>` (a server that never touches the target — use only for local
+analysis servers like Semgrep over stdio, **never** for Burp or anything that fetches).
 
 > A hook can deny. A system prompt can only ask. **Put every guarantee in a hook
 > and every preference in a prompt**, and never confuse the two. Claude Code's own

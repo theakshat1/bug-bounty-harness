@@ -184,7 +184,10 @@ in this document.**
 - [ ] Prefer read-only-by-construction servers (HackerOne MCP)
 - [ ] Secrets via `${VAR}` or `headersHelper`, never literals in a committed `.mcp.json`
 - [ ] Run security MCP servers in a container/VM, not on the host
-- [ ] `PreToolUse` scope hook, failing **closed**
+- [ ] `PreToolUse` scope hook, failing **closed**, and **covering `mcp__*` tools** —
+      allowlisting a tool is not the same as constraining which host it may reach.
+      Verify this specifically; it is the easiest scope control to get wrong, because
+      an MCP tool name doesn't look like a network call
 - [ ] Audit with MCP Inspector before trusting any server's README
 - [ ] Pin tool definitions by hash; alert on change
 - [ ] Marketplace auto-update **off** for security packs
