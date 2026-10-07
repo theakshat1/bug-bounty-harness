@@ -248,6 +248,16 @@ your program's assets continuously rather than per-campaign.
 
 ---
 
+### 5.3b The documentation check belongs before proof
+
+Advisories and CVE feeds are not the only place "already known" lives. Twice in one
+campaign a candidate passed existence, reachability, impact and a deterministic proof on
+two builds, and then died because the vendor's **own docs** described the behaviour as a
+known limitation with operator guidance attached. Grep the target's documentation tree,
+the doc strings embedded next to the parser or handler, the feature's design issue and
+the release notes for the behaviour *before* spending proof budget (the `hypothesis-forge`
+skill now lists it as the cheapest disqualifier; the `disprover` runs it as Gate 3b).
+
 ## 5.4 The disprove prompt
 
 This is the highest-leverage prompt in the harness. The framing is the point.

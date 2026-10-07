@@ -78,6 +78,9 @@ Kill these outright:
 - "Information disclosure" where you cannot name the sensitive information
 - Anything on the program's `ACCEPTED_RISK` list (check `scope/<program>.md`)
 - Missing security headers / best-practice findings with no demonstrated impact
+- Behaviour the vendor documents as intended or as a known limitation — in the
+  product docs, embedded doc strings, the feature's design issue, or release notes.
+  Grep for it *before* Gate 4; advisories alone are not the novelty check.
 
 ### Gate 4 · PRECONDITIONS
 List every precondition. Mark each:

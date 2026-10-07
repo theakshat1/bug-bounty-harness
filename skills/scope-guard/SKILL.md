@@ -132,6 +132,40 @@ tenant-b: <your second test account>
 Capture `ACCEPTED_RISK` carefully. It is the cheapest way to avoid wasting a
 report, and it feeds Gate 3 (impact).
 
+### Step 5a — Facts the template now requires
+
+- **`PROGRAM_STATE`** — read the platform's own state field, not the marketing copy.
+  Bugcrowd embeds it in the page (`data-props` → `headerProps.state`); a value such as
+  `in_progress_paused` means no submissions are accepted. A paused program is **OUT**.
+- **`AI_POLICY`** — quote any clause about AI or automated tooling verbatim. Some
+  programs ban AI-assisted research outright (one Bugcrowd program: "Do not use ChatGPT,
+  Claude, DeepSeek, Google Gemini or any AI tools during your research"). A ban is
+  **OUT** for this harness; a disclosure requirement goes into the report.
+- **`QUALIFYING_CONDITIONS` / `SEVERITY_TABLE`** — open-source product programs (a
+  database, a server, a library) usually publish their own rules in the repo or an
+  issue: reproduce on the latest release *and* master, unmodified binaries, release
+  builds only, no experimental flags, which component counts, what lowers severity.
+  Copy them verbatim; they decide eligibility more than the platform's VRT does.
+- **`TEST_TARGET`** — when the in-scope asset is a hosted instance you cannot provision
+  (needs an account, email, payment), record whether a **local instance of the same
+  release artifact** is an acceptable stand-in under the program's rules, and say so in
+  the scope file. Most open-source programs accept it; the report must name the exact
+  release build and say the hosted target runs the same code.
+
+### Step 5b — When the brief is behind a login
+
+Platform briefs are client-rendered and often 404 without a session. Fall back, in order:
+1. the JSON the page embeds (`data-props`, `data-api-endpoints` attributes — program
+   description, state, statistics);
+2. the public scope mirror `arkadiyt/bounty-targets-data` (hourly dumps of in/out of
+   scope tables for HackerOne, Bugcrowd, Intigriti, YesWeHack);
+3. the vendor's own policy page, `SECURITY.md`, and its security-updates feed (several
+   vendors serve the table the docs page renders from a JSON endpoint — look for it in
+   the page's JS before giving up);
+4. a web search for the program's own issue/announcement describing the rules.
+Record which source each section came from. If the exclusion list is still unknown,
+write `UNKNOWN` in `ACCEPTED_RISK` so the report writer flags it for the submitter.
+
 ## Step 6 — Make it mechanical
 
 Prompting yourself is not a control. Generate `scope/allowlist.txt` and let the

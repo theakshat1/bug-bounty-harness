@@ -111,9 +111,14 @@ For **every** candidate, spawn a `disprover` subagent.
 - Use a different model from the hunter where possible.
 - The disprover **cannot file findings** — it can only return a verdict.
 
-Route the verdicts:
+Route the verdicts **yourself, with `scripts/record-verdict.py`** — the disprover
+returns a verdict file and never touches the ledger:
 - `CONFIRMED` → `findings/confirmed.jsonl` with `"gate_6_human_reviewed": false`
-- everything else → `findings/rejected.jsonl` with `kill_reason` and `gate_failed`
+- everything else → `findings/rejected.jsonl` with `reason`, `gate_failed` and `reopen_if`
+The script validates against `schema/finding.schema.md` before appending, so a malformed
+line cannot reach the ledger. A proven behaviour that the vendor documents as intended
+is recorded as `rejected` at gate 5 with the doc location — keep the proof paths in
+`reason`; the human may still choose to file it as hardening.
 
 Expect to kill most of what the hunters produce. That is the system working, not
 failing. If your pipeline isn't discarding the overwhelming majority of its own

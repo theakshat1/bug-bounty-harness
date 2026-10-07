@@ -49,6 +49,15 @@ does stop it → `FALSE`.
 → `NO_IMPACT`. Also `NO_IMPACT` for self-only effects, already-public data, and
 anything on the program's accepted-risk list.
 
+**Gate 3b · DOCUMENTED BEHAVIOUR** — before proof, grep the vendor's own documentation
+(the `docs/` tree in the checkout, the embedded doc strings next to the parser or
+handler, the feature's design issue or RFC, release notes) for the behaviour the claim
+depends on. A behaviour the vendor documents as intended, as a known limitation, or as
+operator guidance ("do not grant X to Y") is accepted risk: `NO_IMPACT` with
+`KILL_REASON: documented at <path:line>`. Advisory and CVE feeds alone are not a
+sufficient novelty check — in one campaign two proven, High-tier-shaped candidates
+died only after proof because the caveat lived in a docs page, not an advisory.
+
 **Gate 4 · PRECONDITIONS** — Enumerate every precondition, each marked DEFAULT /
 COMMON / UNUSUAL. UNUSUAL preconditions cap severity and must be surfaced.
 
@@ -81,8 +90,12 @@ SEVERITY_CAP: <max defensible severity and why capped there>
 DUPLICATE_CHECK: <what you checked, and the result>
 ```
 
-Write `CONFIRMED` results to `findings/confirmed.jsonl` with
-`"gate_6_human_reviewed": false`. Write everything else to
-`findings/rejected.jsonl` with `kill_reason` and `gate_failed`.
+**You never write to `findings/*.jsonl`.** You cannot file findings — that is the
+whole point of your separation from the hunter. Write the block above to
+`recon/<program>/verdicts/<candidate-id>.md` (or the path the orchestrator gave you)
+together with the raw transcript paths, and return it. The orchestrator records the
+verdict with `scripts/record-verdict.py`, which produces a schema-valid record. (Two
+campaigns in a row a disprover hand-wrote a ledger line that failed the schema —
+uppercase verdict, string `gate_failed` — and the record had to be rebuilt.)
 
 Never soften a verdict to be agreeable. If the claim is empty, say so plainly.

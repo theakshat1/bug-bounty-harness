@@ -240,6 +240,17 @@ it.
 
 Any "yes" → the hypothesis starts at a heavy penalty and needs a real angle to survive.
 
+### The documentation check (run it before scoring)
+
+For every hypothesis, grep the target's **own documentation** — the `docs/` tree, doc
+strings embedded next to the parser/handler, the feature's design issue, the release
+notes — for the behaviour it depends on. If the vendor already describes it as intended,
+as a known limitation, or as operator guidance ("keep privilege X out of Y"), the
+hypothesis is **dead on arrival**: it is accepted risk and will be closed as known
+regardless of how well it proves. Record it in the rejected list with the doc location.
+This is the cheapest disqualifier there is, and skipping it cost a full
+hunt + validate cycle twice in one campaign.
+
 ### Crowding score
 
 | Signal | Score |

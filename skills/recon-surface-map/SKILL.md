@@ -21,6 +21,20 @@ collection on out-of-scope hosts is fine as intel, but **never send active traff
 to anything not on the allowlist** — and mark those hosts `OUT` so no downstream
 agent touches them. Respect the rate limit.
 
+## Phase 0 — Pin what you are reading to what is running
+
+If the target is software you run locally, check out the source at the **exact tag of
+the running release** and read that, not `master`. Record both versions in the
+inventory. Master shows the logic, but line numbers, defaults, feature gates and
+whole routes differ (one recon mapped master routes that returned 404 on the
+release build, and plugins whose master branch required a server version the release
+did not have). Keep a master checkout beside it only for "is this already fixed
+upstream" and "shipped in the last 90 days" questions.
+
+Write every recon file under `recon/<program>/` (or with a `<program>-` prefix if the
+layout is flat) so a second campaign in the same working directory never overwrites
+the first.
+
 ## Phase 1 — Asset inventory
 
 - Passive subdomain enumeration first, then active resolution.

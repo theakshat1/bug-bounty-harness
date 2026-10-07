@@ -9,6 +9,26 @@ VERIFIED:    2026-10-02          # date you last read the live policy
 POLICY_URL:  https://...
 PLATFORM:    hackerone | bugcrowd | intigriti | yeswehack | self-hosted
 SAFE_HARBOR: yes | no | partial  # and where it's stated
+PROGRAM_STATE: in_progress | paused | closed   # from the platform's state field, not the copy
+AI_POLICY:   <verbatim clause, or "none found">  # a ban = OUT; a disclosure rule → report
+SOURCES:     <which section came from the live brief, the embedded JSON, a mirror, the vendor>
+```
+
+## QUALIFYING_CONDITIONS   # open-source product programs: copy the vendor's own rules
+```
+<verbatim: reproduce on latest release AND master? unmodified binaries? release builds
+ only? experimental features excluded? which component counts?>
+```
+
+## SEVERITY_TABLE          # the program's own tiers and what LOWERS severity
+```
+<verbatim>
+```
+
+## TEST_TARGET             # what you actually send traffic to
+```
+<hosted asset, or: "local instance of release <version> (official artifact), stand-in for
+ <hosted asset> under rule <n>">
 ```
 
 ## ALLOWLIST

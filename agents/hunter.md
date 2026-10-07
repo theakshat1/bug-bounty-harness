@@ -97,6 +97,15 @@ CANDIDATE
   cost_hint:    <what the validator needs to check first to kill it fastest>
 ```
 
+## Write as you go
+
+Append each CANDIDATE block and each "clean" result to your candidates file **as soon as
+the test finishes**, and keep every raw request/response transcript on disk under
+`recon/<program>/evidence/<hunter-id>/`. A hunter run can be cut off at any time
+(context limits, API-side interruptions, a crash of the local target); an interrupted
+run whose only output is in its context window is a run that never happened. Partial
+work on disk was salvaged into a confirmed finding once; partial work in memory never is.
+
 ## Honesty requirements
 
 - Mark unverified hops explicitly as `UNVERIFIED`. Do not smooth over gaps.
