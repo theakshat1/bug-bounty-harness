@@ -6,7 +6,8 @@ findings/
 recon/
 reports/
 evidence/
-PROGRESS.md        # run progress notes: program names, findings, decisions
+# run progress notes: program names, findings, decisions
+PROGRESS.md
 
 # Your own corpus additions — past reports, program notes, anomaly ledger.
 # The vendored public corpus IS committed; anything private is not.
