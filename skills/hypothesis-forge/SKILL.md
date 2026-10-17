@@ -251,6 +251,16 @@ regardless of how well it proves. Record it in the rejected list with the doc lo
 This is the cheapest disqualifier there is, and skipping it cost a full
 hunt + validate cycle twice in one campaign.
 
+**Then check the gate the code sits behind.** Find how a user reaches the code path
+(the CLI command name, config flag, setting, feature flag or route), and compare it with
+the program's exclusions. Many programs exclude features marked experimental, beta,
+preview, canary or opt-in, or reduce their severity. If the only path in runs through
+something like an `experimental_*` command, an `allow_experimental_*` setting or a
+`--unstable` flag, and the program excludes that, the hypothesis is dead. Check every
+caller, not only the one you found first: a stable command can share the code, which
+would revive it. Skipping this cost a full hunt on a Vercel CLI slice whose every entry
+point was an `experimental_` command.
+
 ### Crowding score
 
 | Signal | Score |
