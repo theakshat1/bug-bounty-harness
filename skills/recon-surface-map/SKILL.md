@@ -35,6 +35,16 @@ Write every recon file under `recon/<program>/` (or with a `<program>-` prefix i
 layout is flat) so a second campaign in the same working directory never overwrites
 the first.
 
+**Disable phone-home before the first start.** A self-hosted lab of a program's own
+product contacts that program's infrastructure on its own: update and version checks,
+telemetry, license or marketplace calls. That is unplanned traffic to program assets
+that you did not decide to send. Before running the installer, switch it off in the
+product's config. Examples: WordPress `WP_HTTP_BLOCK_EXTERNAL`,
+`AUTOMATIC_UPDATER_DISABLED` and `DISABLE_WP_CRON`; Mattermost
+`DiagnosticsEnabled=false` and plugin marketplace off. Then verify with one call from
+inside the app that an outbound request is refused, and record any contact that
+already happened in the lab notes.
+
 ## Phase 1 — Asset inventory
 
 - Passive subdomain enumeration first, then active resolution.
