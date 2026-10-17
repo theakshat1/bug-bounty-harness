@@ -116,6 +116,17 @@ Run it **twice**. Intermittent means not yet understood → `UNPROVEN`.
 Respect scope and rate limits throughout. Minimum necessary blast radius: one
 record, never the table.
 
+**If the live proof is interrupted** (the validator stops before Gate 5 runs, for
+example on an API error or safety stop), the verdict is `UNPROVEN`, not refuted. Do
+not reuse the hunter's driver to finish it. Write the oracle as a numbered, mechanical
+test plan: the control, the oracle request, the expected observation, how many runs,
+and the cleanup. Hand only that plan to a separate oracle runner. The runner writes
+its own driver, records a raw result table, and does not interpret it. It must not
+read the hunter's candidate, the validator's reasoning or their evidence. Gates 1–4
+from the interrupted validator plus the runner's table complete the ladder. The plan
+should also be the minimum proof: one canary, one request per oracle, with no loops
+that extract data.
+
 ## Output — exactly this shape
 
 ```
