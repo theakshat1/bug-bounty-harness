@@ -172,6 +172,14 @@ On resume, read `scope/`, `recon/coverage.md`, `findings/rejected.jsonl` and
 continue from the first unhunted priority slice. Repeated runs are additive **only
 if you keep the ledgers current.**
 
+**Audit deliverables on every resume and before every handoff.** Run
+`python3 scripts/check-deliverables.py`. It lists findings whose report is missing,
+or whose status still says drafting or pending. A background agent that dies on a
+rate limit or API error leaves its deliverable undone, while the summary table
+already says the work is in progress. Re-queue every row it flags explicitly. Also
+re-check that each ready finding still reproduces on the newest release (see
+`validate-finding`, "Re-check the newest release").
+
 ## What to tell the user at the end of a run
 
 - surfaces covered vs still unhunted (so they know the recall gap)
