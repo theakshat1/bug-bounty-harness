@@ -170,3 +170,14 @@ DUPLICATE_CHECK:
   your hunting is weakest at.
 
 Never let a non-CONFIRMED candidate reach a report draft.
+
+**Re-check the newest release before calling a finding ready, and again before
+filing.** Open-source vendors ship fixes fast, sometimes for someone else's report of
+the same bug. List the release tags (`git ls-remote --tags`). If a newer release or a
+newer master than the one you tested exists, diff every file the report cites against
+it. A change at a cited location means reading it. If it fixes the bug, the finding moves
+to `rejected.jsonl` (gate 5, "fixed upstream before filing"). If the code is unchanged,
+re-run the reproduction live on the newest release when the program's rules require it.
+ClickHouse, for example, requires the latest release and master. Two confirmed
+ClickHouse findings were fixed upstream within two weeks of discovery, one with the
+exact remedy the report proposed.
