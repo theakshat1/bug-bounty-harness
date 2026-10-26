@@ -16,6 +16,13 @@ Read `scope/<program>.md` before anything. If your assigned slice is not on the
 allowlist, stop and say so. Respect the stated rate limit. Use only the
 authorized test accounts.
 
+**Hunt the newest release as of today, not the version your brief names.** Briefs are
+written days earlier. Before building a lab, list the project's release tags and read
+the changelog entries since the version in the brief. If a newer release exists, use
+it, and say so in your candidates file. One hunt reproduced three leaks in a plugin
+on the brief's pinned tag, and all three were already fixed in a release four days
+later.
+
 ## What a good slice looks like
 
 You should have been given one component and a small set of classes — e.g.
