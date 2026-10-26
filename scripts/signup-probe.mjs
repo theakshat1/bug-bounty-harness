@@ -22,12 +22,17 @@ for (const url of urls) {
   const host = new URL(url).hostname; const rec = { url, host, ts: new Date().toISOString() };
   if (!allowed(host)) { rec.error = 'host not on allowlist; not loaded'; fs.appendFileSync(out, JSON.stringify(rec) + '\n'); console.log(JSON.stringify(rec)); continue; }
   const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36' });
-  const page = await ctx.newPage(); const reqs = [];
-  page.on('request', r => reqs.push(r.url()));
+  const page = await ctx.newPage(); const reqs = []; rec.blocked = [];
+  // Never contact a host that is not on the allowlist: abort the request (navigation or sub-resource) and record it.
+  // Vendor detection still works from the HTML and from the URLs of the aborted requests.
+  await page.route('**/*', route => { const u = route.request().url(); reqs.push(u);
+    let h = ''; try { h = new URL(u).hostname; } catch { return route.abort(); }
+    if (!allowed(h)) { rec.blocked.push((route.request().isNavigationRequest() ? 'NAV ' : '') + h); return route.abort(); }
+    return route.continue(); });
   try {
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForTimeout(6000);
-    rec.status = resp ? resp.status() : null; rec.final_url = page.url(); rec.title = (await page.title()).slice(0, 120);
+    rec.status = resp ? resp.status() : null; rec.final_url = page.url(); rec.blocked = [...new Set(rec.blocked)].slice(0, 30); rec.title = (await page.title()).slice(0, 120);
     const html = await page.content(); const blob = html + '\n' + reqs.join('\n');
     rec.bot_controls = Object.entries(VENDORS).filter(([, re]) => re.test(blob)).map(([k]) => k);
     rec.fields = await page.evaluate(() => [...document.querySelectorAll('input')].map(i => (i.type || 'text') + ':' + (i.name || i.id || i.autocomplete || '')).slice(0, 25));
