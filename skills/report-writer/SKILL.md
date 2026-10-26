@@ -107,6 +107,12 @@ attacker gains. Concrete nouns. Never the class name as the impact.>
 Account A (attacker): acct-a@...        Account B (victim): acct-b@...
 Canary in B's data: CANARY-B-7f3a       ← makes the proof unambiguous
 
+(Writer's note, not report text: write the commands as ```sh blocks with `# expected:` comments and
+placeholder lines such as `WP=` / `AUTH=`. Before the report is marked ready, run them unchanged on a
+fresh lab: `python3 scripts/run-report-steps.py <report> <outdir> --run WP=... AUTH=...`. Then compare
+the output with every expected comment. Steps the lab ran in a different form are not yet tested.
+One drafted report's steps had never been run as written until this check.)
+
 ## Request / response evidence
 <Raw HTTP as TEXT in fenced blocks, tokens and cookies redacted.
 Never screenshot a request. Keep every URL copy-pasteable.>
